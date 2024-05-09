@@ -25,26 +25,6 @@ def write_nfc_tag(nfcTag):
         print('Can`t establish connection to database')
 
 
-nfc_tag = ''
-
-HOSTS_LIST = {
-    'reader_1': '10.10.2.20', 
-    'reader_2': '10.10.2.21', 
-    'reader_3': '10.10.2.22', 
-    'reader_4': '10.10.2.23', 
-    'reader_5': '10.10.2.24', 
-    'reader_6': '10.10.2.25', 
-    'reader_7': '10.10.2.26', 
-    'reader_8': '10.10.2.27', 
-    }
-PORT = 10001            # The same port
-COMMANDS = {
-    '020009ffb001001843'
-}
-
-HOST = '10.10.2.26'     # The remote host for test
-
-
 def rfid_reader(ip, port, command, tag):
     global nfc_tag
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -71,8 +51,28 @@ def rfid_reader(ip, port, command, tag):
             print('Can`t establish connection to RFID reader')     
         
 
+
+nfc_tag = ''
+
+# Constant definition field
+HOSTS_LIST = {
+    'reader_1': '10.10.2.20', 
+    'reader_2': '10.10.2.21', 
+    'reader_3': '10.10.2.22', 
+    'reader_4': '10.10.2.23', 
+    'reader_5': '10.10.2.24', 
+    'reader_6': '10.10.2.25', 
+    'reader_7': '10.10.2.26', 
+    'reader_8': '10.10.2.27', 
+    }
+PORT = 10001
+COMMANDS = {
+    'host_read': '020009ffb001001843'
+}
+
+HOST = '10.10.2.26'     # The remote host for test
+
+# Program
 while True:
+    rfid_reader(HOST, PORT, COMMANDS['host_read'], nfc_tag)
     time.sleep(2)
-    rfid_reader()
-
-
