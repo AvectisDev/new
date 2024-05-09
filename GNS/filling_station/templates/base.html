@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Газонаполнительная станция</title>
+    <link rel="shortcut icon" type="image/ico" href="/static/traffic_flow/media/Transport.ico"/>
+    <link rel="stylesheet" href="/static/traffic_flow/css/stylesheet.css"/>
+    <link rel="stylesheet" href="/static/traffic_flow/css/form_style.css"/>
+</head>
+<body>
+<div id="header">
+    <a href="/">
+        <img src="/static/traffic_flow/media/logo.svg" width="100%" alt="oops">
+    </a>
+</div>
+
+<div style="
+        margin: 5% 0 0 0;
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        justify-content: center;
+        align-content: stretch;
+        align-items: center;
+        background-color: white;">
+
+    <div style="width: 30%"></div>
+
+    <div style="width: 40%; height: 530px;">
+        {% block content %}
+        {% endblock content %}
+    </div>
+
+    <div style="width: 30%"></div>
+</div>
+
+<div id="footer">
+    <h6>Демо версия</h6>
+</div>
+</body>
+</html>
