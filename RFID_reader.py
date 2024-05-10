@@ -3,21 +3,21 @@ import psycopg2
 import datetime
 import binascii
 import time
+from RFID_parameter import readers, COMMANDS
 
 
-def write_nfc_tag(nfcTag):
-    """функция записывает в базу данных номер метки и дату проведения операции считывания
-    в демо-режиме работает только 1 считыватель, поэтому всем баллонам будет присвоен статус 'Наполнение' """
+def write_nfc_tag(nfc_tag:str, status:str):
+    """функция записывает в базу данных номер метки и дату проведения операции считывания"""
 
     try:
         conn =  psycopg2.connect(dbname="PinskGNS", host="localhost", user="postgres", password=".avectis1", port="5432")
-        print("Connection established")
+        print("Connection with data base established")
         conn.autocommit = True
 
         with conn.cursor() as cursor:
-            data = (nfcTag, "Наполнение", datetime.datetime.now())
+            data = (nfc_tag, status, datetime.datetime.now())
             cursor.execute("INSERT INTO filling_station_ballon (nfc_tag, state, creation_date) VALUES (%s, %s, %s)", data)
-            print("Данные добавлены")
+            print("Data added")
 
         conn.close()
     
@@ -25,54 +25,42 @@ def write_nfc_tag(nfcTag):
         print('Can`t establish connection to database')
 
 
-def rfid_reader(ip, port, command, tag):
-    global nfc_tag
+def read_nfc_tag(reader:dict, command:str):
+    """функция отправляет запрос на считыватель FEIG и получает в ответ дату, время и номер RFID метки """
+
+    previous_nfc_tag = reader['nfc_tag']    # присваиваем предыдущую метку временной переменной
+
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         
         try:
-            print("Connecting...")
-            s.connect((ip, port))  
+            s.settimeout(1)
+            print(f"Connecting to {reader['ip']}:{reader['port']}")
+            s.connect((reader['ip'], reader['port']))  
 
             #send data to FEIG
             s.sendall(binascii.unhexlify(command))
             print('send complete')
+
             data = s.recv(2048)
             data_bytes = binascii.hexlify(data)
             buffer = data_bytes.decode()
             print('Recive complete. Data from reader: ', buffer)
 
             if len(buffer) > 18:
-                previous_nfc_tag = nfc_tag
-                nfc_tag = buffer[18:34]
-            if nfc_tag != previous_nfc_tag:
-                write_nfc_tag(nfc_tag)
-                print(nfc_tag)
+                nfc_tag = buffer[18:34]  # из буфера получаем новую метку
+                if nfc_tag != previous_nfc_tag:
+                    write_nfc_tag(nfc_tag, reader['status'])
+                    print(nfc_tag)
+            else:
+                nfc_tag = previous_nfc_tag
+           
+            return nfc_tag  #из функции возвращаем значение считанной метки
         except:
-            print('Can`t establish connection to RFID reader')     
-        
+            print(f'Can`t establish connection with RFID reader {reader['ip']}:{reader['port']}')     
 
-
-nfc_tag = ''
-
-# Constant definition field
-HOSTS_LIST = {
-    'reader_1': '10.10.2.20', 
-    'reader_2': '10.10.2.21', 
-    'reader_3': '10.10.2.22', 
-    'reader_4': '10.10.2.23', 
-    'reader_5': '10.10.2.24', 
-    'reader_6': '10.10.2.25', 
-    'reader_7': '10.10.2.26', 
-    'reader_8': '10.10.2.27', 
-    }
-PORT = 10001
-COMMANDS = {
-    'host_read': '020009ffb001001843'
-}
-
-HOST = '10.10.2.26'     # The remote host for test
 
 # Program
 while True:
-    rfid_reader(HOST, PORT, COMMANDS['host_read'], nfc_tag)
-    time.sleep(2)
+    for reader in readers:
+        reader['nfc_tag'] = read_nfc_tag(reader, COMMANDS['host_read'])
+        time.sleep(1)
