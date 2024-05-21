@@ -7,6 +7,5 @@ urlpatterns = [
     path('client/', views.client, name="client"),
     #path('client/loading/', views.loading, name='loading'),
     #path('client/unloading/', views.unloading, name='unloading'),
-    path('operator/table/', views.operator, name='operator_table'),
-    #path('driver/table/', views.driver, name='driver_table')
+    path('operator/table/', views.operator, name='operator_table')
 ]

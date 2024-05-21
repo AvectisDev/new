@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.core.paginator import Paginator
 from .models import Ballon
 from .forms import Process, OperatorControl
 from datetime import datetime
@@ -21,5 +22,8 @@ def client(request):
 
 
 def operator(request):
-    ballons = Ballon.objects.all()
-    return render(request, "ballons_table.html", {"ballons": ballons})
+    ballons = Ballon.objects.order_by('-creation_date')
+    paginator = Paginator(ballons, 5)
+    page_num = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_num)
+    return render(request, "ballons_table.html", {"page_obj": page_obj})
