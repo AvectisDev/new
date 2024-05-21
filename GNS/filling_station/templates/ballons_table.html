@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div style="
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+    align-content: stretch;
+    align-items: flex-start;
+    background-color: white;
+    height: 600px;">
+
+
+    <div style="width: 100%">
+        <table>
+            <tr>
+                <th>№ Баллона</th>
+                <th>Дата добавления</th>
+                <th>Статус</th>
+            </tr>
+            {% for ballon in ballons %}
+            <tr>
+                <td>{{ ballon.nfc_tag }}</td>
+                <td>{{ ballon.creation_date }}</td>
+                <td>{{ ballon.state }}</td>
+            </tr>
+            {% endfor %}
+
+        </table>
+    </div>
+</div>
+
+{% endblock content %}

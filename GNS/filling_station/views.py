@@ -13,3 +13,13 @@ locale.setlocale(locale.LC_TIME, "ru-RU")
 def index(request):
     ballons = Ballon.objects.all()
     return render(request, "home.html", {"ballons": ballons})
+
+
+def client(request):
+    ballons = Ballon.objects.all()
+    return render(request, "home.html", {"ballons": ballons})
+
+
+def operator(request):
+    ballons = Ballon.objects.all()
+    return render(request, "ballons_table.html", {"ballons": ballons})
