@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 
 <html lang="en">
@@ -8,6 +10,10 @@
     <link rel="stylesheet" href="/static/filling_station/css/stylesheet.css"/>
     <link rel="stylesheet" href='/static/filling_station/css/form_style.css'/>
     <link rel="stylesheet" href="/static/filling_station/css/table_style.css">
+    <!-- <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/js/bootstrap.min.js' %}"> -->
+    <link rel="stylesheet" href="/static/filling_station/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/filling_station/bootstrap/js/bootstrap.min.js">
 </head>
 <body>
 <div id="header">
@@ -26,14 +32,14 @@
         align-items: center;
         background-color: white;">
 
-    <div style="width: 10%"></div>
+    <div style="width: 20%"></div>
 
-    <div style="width: 80%; height: 650px;">
+    <div style="width: 60%; height: 650px;">
         {% block content %}
         {% endblock content %}
     </div>
 
-    <div style="width: 10%"></div>
+    <div style="width: 20%"></div>
 </div>
 
 <div id="footer">
