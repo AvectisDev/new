@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.core.paginator import Paginator
 from .models import Ballon
 from .forms import Process, OperatorControl
-from datetime import datetime
+from datetime import datetime, date, time, timedelta
 import locale
 
 
@@ -21,9 +21,90 @@ def client(request):
     return render(request, "home.html", {"ballons": ballons})
 
 
-def operator(request):
-    ballons = Ballon.objects.order_by('-creation_date')
-    paginator = Paginator(ballons, 5)
+def reader1(request):
+    ballons = Ballon.objects.order_by('-id').filter(state = 'Регистрация пустого баллона на складе (цех)')
+    paginator = Paginator(ballons, 18)
     page_num = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_num)
-    return render(request, "ballons_table.html", {"page_obj": page_obj})
+
+    last_date_amount = len(ballons.filter(creation_date = datetime.today()))
+    previous_date_amount = len(ballons.filter(creation_date = datetime.today() - timedelta(days=1)))
+
+    return render(request, "ballons_table_1.html", {"page_obj": page_obj, 'ballons_amount': last_date_amount, 'previous_ballons_amount': previous_date_amount})
+
+def reader2(request):
+    ballons = Ballon.objects.order_by('-id').filter(state = 'Наполнение баллона сжиженным газом')
+    paginator = Paginator(ballons, 18)
+    page_num = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_num)
+
+    last_date_amount = len(ballons.filter(creation_date = datetime.today()))
+    previous_date_amount = len(ballons.filter(creation_date = datetime.today() - timedelta(days=1)))
+
+    return render(request, "ballons_table_2.html", {"page_obj": page_obj, 'ballons_amount': last_date_amount, 'previous_ballons_amount': previous_date_amount})
+
+def reader3(request):
+    ballons = Ballon.objects.order_by('-id').filter(state = 'Регистрация пустого баллона на складе (рампа)')
+    paginator = Paginator(ballons, 18)
+    page_num = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_num)
+
+    last_date_amount = len(ballons.filter(creation_date = datetime.today()))
+    previous_date_amount = len(ballons.filter(creation_date = datetime.today() - timedelta(days=1)))
+
+    return render(request, "ballons_table_3.html", {"page_obj": page_obj, 'ballons_amount': last_date_amount, 'previous_ballons_amount': previous_date_amount})
+
+def reader4(request):
+    ballons = Ballon.objects.order_by('-id').filter(state = 'Регистрация полного баллона на складе')
+    paginator = Paginator(ballons, 18)
+    page_num = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_num)
+
+    last_date_amount = len(ballons.filter(creation_date = datetime.today()))
+    previous_date_amount = len(ballons.filter(creation_date = datetime.today() - timedelta(days=1)))
+
+    return render(request, "ballons_table_4.html", {"page_obj": page_obj, 'ballons_amount': last_date_amount, 'previous_ballons_amount': previous_date_amount})
+
+def reader5(request):
+    ballons = Ballon.objects.order_by('-id').filter(state = 'Погрузка полного баллона на тралл 2')
+    paginator = Paginator(ballons, 18)
+    page_num = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_num)
+
+    last_date_amount = len(ballons.filter(creation_date = datetime.today()))
+    previous_date_amount = len(ballons.filter(creation_date = datetime.today() - timedelta(days=1)))
+
+    return render(request, "ballons_table_5.html", {"page_obj": page_obj, 'ballons_amount': last_date_amount, 'previous_ballons_amount': previous_date_amount})
+
+def reader6(request):
+    ballons = Ballon.objects.order_by('-id').filter(state = 'Погрузка полного баллона на тралл 1')
+    paginator = Paginator(ballons, 18)
+    page_num = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_num)
+
+    last_date_amount = len(ballons.filter(creation_date = datetime.today()))
+    previous_date_amount = len(ballons.filter(creation_date = datetime.today() - timedelta(days=1)))
+
+    return render(request, "ballons_table_6.html", {"page_obj": page_obj, 'ballons_amount': last_date_amount, 'previous_ballons_amount': previous_date_amount})
+
+def reader7(request):
+    ballons = Ballon.objects.order_by('-id').filter(state = 'Погрузка полного баллона в кассету')
+    paginator = Paginator(ballons, 18)
+    page_num = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_num)
+
+    last_date_amount = len(ballons.filter(creation_date = datetime.today()))
+    previous_date_amount = len(ballons.filter(creation_date = datetime.today() - timedelta(days=1)))
+
+    return render(request, "ballons_table_7.html", {"page_obj": page_obj, 'ballons_amount': last_date_amount, 'previous_ballons_amount': previous_date_amount})
+
+def reader8(request):
+    ballons = Ballon.objects.order_by('-id').filter(state = 'Регистрация пустого баллона на складе (из кассеты)')
+    paginator = Paginator(ballons, 18)
+    page_num = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_num)
+
+    last_date_amount = len(ballons.filter(creation_date = datetime.today()))
+    previous_date_amount = len(ballons.filter(creation_date = datetime.today() - timedelta(days=1)))
+
+    return render(request, "ballons_table_8.html", {"page_obj": page_obj, 'ballons_amount': last_date_amount, 'previous_ballons_amount': previous_date_amount})
