@@ -56,10 +56,11 @@ def reader2(request):
     page_num = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_num)
 
+    format = '%d.%m.%Y'
+
     date_process = GetBallonsAmount()
     if request.method == "POST":
         required_date = request.POST.get("date")
-        format = '%d.%m.%Y'
         format_required_date = datetime.strptime(required_date, format)
     else:
         date_process = GetBallonsAmount()
@@ -69,12 +70,13 @@ def reader2(request):
     previous_date_amount = len(ballons.filter(creation_date = datetime.today() - timedelta(days=1)))     
     required_date_amount = len(ballons.filter(creation_date = format_required_date))
 
+    view_required_data = datetime.strftime(format_required_date, format)
     return render(request, "ballons_table_2.html", {
         "page_obj": page_obj, 
         'ballons_amount': last_date_amount, 
         'previous_ballons_amount': previous_date_amount,
         'required_date_amount': required_date_amount,
-        'format_required_date': format_required_date,
+        'format_required_date': view_required_data,
         'form': date_process})
 
 def reader3(request):
@@ -83,10 +85,11 @@ def reader3(request):
     page_num = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_num)
 
+    format = '%d.%m.%Y'
+
     date_process = GetBallonsAmount()
     if request.method == "POST":
         required_date = request.POST.get("date")
-        format = '%d.%m.%Y'
         format_required_date = datetime.strptime(required_date, format)
     else:
         date_process = GetBallonsAmount()
@@ -96,12 +99,13 @@ def reader3(request):
     previous_date_amount = len(ballons.filter(creation_date = datetime.today() - timedelta(days=1)))     
     required_date_amount = len(ballons.filter(creation_date = format_required_date))
 
+    view_required_data = datetime.strftime(format_required_date, format)
     return render(request, "ballons_table_3.html", {
         "page_obj": page_obj, 
         'ballons_amount': last_date_amount, 
         'previous_ballons_amount': previous_date_amount,
         'required_date_amount': required_date_amount,
-        'format_required_date': format_required_date,
+        'format_required_date': view_required_data,
         'form': date_process})
 
 def reader4(request):
@@ -110,10 +114,11 @@ def reader4(request):
     page_num = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_num)
 
+    format = '%d.%m.%Y'
+
     date_process = GetBallonsAmount()
     if request.method == "POST":
         required_date = request.POST.get("date")
-        format = '%d.%m.%Y'
         format_required_date = datetime.strptime(required_date, format)
     else:
         date_process = GetBallonsAmount()
@@ -123,12 +128,13 @@ def reader4(request):
     previous_date_amount = len(ballons.filter(creation_date = datetime.today() - timedelta(days=1)))     
     required_date_amount = len(ballons.filter(creation_date = format_required_date))
 
+    view_required_data = datetime.strftime(format_required_date, format)
     return render(request, "ballons_table_4.html", {
         "page_obj": page_obj, 
         'ballons_amount': last_date_amount, 
         'previous_ballons_amount': previous_date_amount,
         'required_date_amount': required_date_amount,
-        'format_required_date': format_required_date,
+        'format_required_date': view_required_data,
         'form': date_process})
 
 def reader5(request):
@@ -137,10 +143,11 @@ def reader5(request):
     page_num = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_num)
 
+    format = '%d.%m.%Y'
+
     date_process = GetBallonsAmount()
     if request.method == "POST":
         required_date = request.POST.get("date")
-        format = '%d.%m.%Y'
         format_required_date = datetime.strptime(required_date, format)
     else:
         date_process = GetBallonsAmount()
@@ -150,12 +157,13 @@ def reader5(request):
     previous_date_amount = len(ballons.filter(creation_date = datetime.today() - timedelta(days=1)))     
     required_date_amount = len(ballons.filter(creation_date = format_required_date))
 
+    view_required_data = datetime.strftime(format_required_date, format)
     return render(request, "ballons_table_5.html", {
         "page_obj": page_obj, 
         'ballons_amount': last_date_amount, 
         'previous_ballons_amount': previous_date_amount,
         'required_date_amount': required_date_amount,
-        'format_required_date': format_required_date,
+        'format_required_date': view_required_data,
         'form': date_process})
 
 def reader6(request):
@@ -164,10 +172,11 @@ def reader6(request):
     page_num = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_num)
 
+    format = '%d.%m.%Y'
+
     date_process = GetBallonsAmount()
     if request.method == "POST":
         required_date = request.POST.get("date")
-        format = '%d.%m.%Y'
         format_required_date = datetime.strptime(required_date, format)
     else:
         date_process = GetBallonsAmount()
@@ -177,12 +186,13 @@ def reader6(request):
     previous_date_amount = len(ballons.filter(creation_date = datetime.today() - timedelta(days=1)))     
     required_date_amount = len(ballons.filter(creation_date = format_required_date))
 
+    view_required_data = datetime.strftime(format_required_date, format)
     return render(request, "ballons_table_6.html", {
         "page_obj": page_obj, 
         'ballons_amount': last_date_amount, 
         'previous_ballons_amount': previous_date_amount,
         'required_date_amount': required_date_amount,
-        'format_required_date': format_required_date,
+        'format_required_date': view_required_data,
         'form': date_process})
 
 def reader7(request):
@@ -191,10 +201,11 @@ def reader7(request):
     page_num = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_num)
 
+    format = '%d.%m.%Y'
+
     date_process = GetBallonsAmount()
     if request.method == "POST":
         required_date = request.POST.get("date")
-        format = '%d.%m.%Y'
         format_required_date = datetime.strptime(required_date, format)
     else:
         date_process = GetBallonsAmount()
@@ -204,12 +215,13 @@ def reader7(request):
     previous_date_amount = len(ballons.filter(creation_date = datetime.today() - timedelta(days=1)))     
     required_date_amount = len(ballons.filter(creation_date = format_required_date))
 
+    view_required_data = datetime.strftime(format_required_date, format)
     return render(request, "ballons_table_7.html", {
         "page_obj": page_obj, 
         'ballons_amount': last_date_amount, 
         'previous_ballons_amount': previous_date_amount,
         'required_date_amount': required_date_amount,
-        'format_required_date': format_required_date,
+        'format_required_date': view_required_data,
         'form': date_process})
 
 def reader8(request):
@@ -218,10 +230,11 @@ def reader8(request):
     page_num = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_num)
 
+    format = '%d.%m.%Y'
+
     date_process = GetBallonsAmount()
     if request.method == "POST":
         required_date = request.POST.get("date")
-        format = '%d.%m.%Y'
         format_required_date = datetime.strptime(required_date, format)
     else:
         date_process = GetBallonsAmount()
@@ -231,10 +244,11 @@ def reader8(request):
     previous_date_amount = len(ballons.filter(creation_date = datetime.today() - timedelta(days=1)))     
     required_date_amount = len(ballons.filter(creation_date = format_required_date))
 
+    view_required_data = datetime.strftime(format_required_date, format)
     return render(request, "ballons_table_8.html", {
         "page_obj": page_obj, 
         'ballons_amount': last_date_amount, 
         'previous_ballons_amount': previous_date_amount,
         'required_date_amount': required_date_amount,
-        'format_required_date': format_required_date,
+        'format_required_date': view_required_data,
         'form': date_process})

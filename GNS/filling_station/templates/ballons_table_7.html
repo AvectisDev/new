@@ -52,11 +52,11 @@
         <p>Количество баллонов за {{ format_required_date }} - {{ required_date_amount }}</p>
     </div>
     
-    <div>
+    <div align="center">
         <form class="some-class" method="post" enctype="multipart/form-data">
            {% csrf_token %}
            {{ form }}
-           <button style="margin: 5% 2% 5% 25%;" type="submit">Отобразить</button>
+           <button style="margin: 5% 2% 5% 5%;" type="submit">Отобразить</button>
         </form>
    </div>
 
