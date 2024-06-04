@@ -15,6 +15,5 @@ urlpatterns = [
 
     path('client/', views.client, name="client"),
     #path('client/loading/', views.loading, name='loading'),
-    #path('client/unloading/', views.unloading, name='unloading'),
-    path('operator/table/', views.reader1, name='operator_table')
+    #path('client/unloading/', views.unloading, name='unloading')
 ]

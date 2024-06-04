@@ -5,9 +5,6 @@
     <meta charset="UTF-8">
     <title>Газонаполнительная станция</title>
     <link rel="shortcut icon" type="image/ico" href='/static/filling_station/media/Gas.ico'/>
-    <link rel="stylesheet" href="/static/filling_station/css/stylesheet.css"/>
-    <link rel="stylesheet" href='/static/filling_station/css/form_style.css'/>
-    <link rel="stylesheet" href="/static/filling_station/css/table_style.css">
     <link rel="stylesheet" href="/static/filling_station/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/filling_station/bootstrap/js/bootstrap.min.js">
 </head>
@@ -37,24 +34,13 @@
         <button type="button" class="btn btn-primary">Sign-up</button>
       </div>
     </header>
-  </div>
+</div>
 
-<div style="
-        margin: 1% 1% 5% 1%;
-        display: flex;
-        flex-wrap: wrap;
-        flex-direction: row;
-        justify-content: center;
-        align-content: stretch;
-        align-items: center;
-        background-color: white;">
-
-    <div style="width: 60%; height: 650px;">
+  <!-- <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between"> -->
+  <div class="d-flex justify-content-center">
         {% block content %}
         {% endblock content %}
-    </div>
-
-</div>
+  </div>
 
 </body>
 </html>

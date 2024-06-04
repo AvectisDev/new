@@ -14,5 +14,5 @@ class Process(forms.Form):
         return phone_number_data
 
 
-class OperatorControl(forms.Form):
-    n = 5
+class GetBallonsAmount(forms.Form):
+    date = forms.CharField(max_length=15, label="Дата", widget=forms.TextInput(attrs={'placeholder': 'дд.мм.гг'}))
