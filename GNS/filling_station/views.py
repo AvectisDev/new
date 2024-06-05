@@ -2,14 +2,13 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.core.paginator import Paginator
 from .models import Ballon
+from .admin import BallonResources
 from .forms import Process, GetBallonsAmount
 from datetime import datetime, date, time, timedelta
 import locale
 
 
-
 # locale.setlocale(locale.LC_TIME, "ru-RU")
-
 
 def index(request):
     ballons = Ballon.objects.all()
@@ -23,6 +22,7 @@ def client(request):
 
 def reader1(request):
     ballons = Ballon.objects.order_by('-id').filter(state = 'Регистрация пустого баллона на складе (цех)')
+
     paginator = Paginator(ballons, 15)
     page_num = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_num)
@@ -33,6 +33,11 @@ def reader1(request):
     if request.method == "POST":
         required_date = request.POST.get("date")
         format_required_date = datetime.strptime(required_date, format)
+
+        dataset = BallonResources().export(Ballon.objects.filter(state = 'Регистрация пустого баллона на складе (цех)', ))
+        response = HttpResponse(dataset.xls, content_type='xls')
+        response['Content-Disposition'] = 'attachment; filename="exported_data.xls"'
+        return response
     else:
         date_process = GetBallonsAmount()
         format_required_date = datetime.today()
@@ -42,7 +47,7 @@ def reader1(request):
     required_date_amount = len(ballons.filter(creation_date = format_required_date))
 
     view_required_data = datetime.strftime(format_required_date, format)
-    return render(request, "ballons_table_1.html", {
+    return render(request, "ballons_table.html", {
         "page_obj": page_obj, 
         'ballons_amount': last_date_amount, 
         'previous_ballons_amount': previous_date_amount,
@@ -71,7 +76,7 @@ def reader2(request):
     required_date_amount = len(ballons.filter(creation_date = format_required_date))
 
     view_required_data = datetime.strftime(format_required_date, format)
-    return render(request, "ballons_table_2.html", {
+    return render(request, "ballons_table.html", {
         "page_obj": page_obj, 
         'ballons_amount': last_date_amount, 
         'previous_ballons_amount': previous_date_amount,
@@ -100,7 +105,7 @@ def reader3(request):
     required_date_amount = len(ballons.filter(creation_date = format_required_date))
 
     view_required_data = datetime.strftime(format_required_date, format)
-    return render(request, "ballons_table_3.html", {
+    return render(request, "ballons_table.html", {
         "page_obj": page_obj, 
         'ballons_amount': last_date_amount, 
         'previous_ballons_amount': previous_date_amount,
@@ -129,7 +134,7 @@ def reader4(request):
     required_date_amount = len(ballons.filter(creation_date = format_required_date))
 
     view_required_data = datetime.strftime(format_required_date, format)
-    return render(request, "ballons_table_4.html", {
+    return render(request, "ballons_table.html", {
         "page_obj": page_obj, 
         'ballons_amount': last_date_amount, 
         'previous_ballons_amount': previous_date_amount,
@@ -158,7 +163,7 @@ def reader5(request):
     required_date_amount = len(ballons.filter(creation_date = format_required_date))
 
     view_required_data = datetime.strftime(format_required_date, format)
-    return render(request, "ballons_table_5.html", {
+    return render(request, "ballons_table.html", {
         "page_obj": page_obj, 
         'ballons_amount': last_date_amount, 
         'previous_ballons_amount': previous_date_amount,
@@ -187,7 +192,7 @@ def reader6(request):
     required_date_amount = len(ballons.filter(creation_date = format_required_date))
 
     view_required_data = datetime.strftime(format_required_date, format)
-    return render(request, "ballons_table_6.html", {
+    return render(request, "ballons_table.html", {
         "page_obj": page_obj, 
         'ballons_amount': last_date_amount, 
         'previous_ballons_amount': previous_date_amount,
@@ -216,7 +221,7 @@ def reader7(request):
     required_date_amount = len(ballons.filter(creation_date = format_required_date))
 
     view_required_data = datetime.strftime(format_required_date, format)
-    return render(request, "ballons_table_7.html", {
+    return render(request, "ballons_table.html", {
         "page_obj": page_obj, 
         'ballons_amount': last_date_amount, 
         'previous_ballons_amount': previous_date_amount,
@@ -245,7 +250,7 @@ def reader8(request):
     required_date_amount = len(ballons.filter(creation_date = format_required_date))
 
     view_required_data = datetime.strftime(format_required_date, format)
-    return render(request, "ballons_table_8.html", {
+    return render(request, "ballons_table.html", {
         "page_obj": page_obj, 
         'ballons_amount': last_date_amount, 
         'previous_ballons_amount': previous_date_amount,

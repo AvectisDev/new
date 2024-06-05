@@ -15,4 +15,11 @@ class Process(forms.Form):
 
 
 class GetBallonsAmount(forms.Form):
-    date = forms.CharField(max_length=15, label="Дата", widget=forms.TextInput(attrs={'placeholder': 'дд.мм.гг'}))
+    date = forms.CharField(max_length=10, label="Дата", widget=forms.TextInput(attrs={'placeholder': 'дд.мм.гггг'}))
+
+    def clean_data(self):
+        date_data = self.cleaned_data["date"]
+        if date_data is None:
+            raise forms.ValidationError("Поле не может быть пустым")
+        return date_data
+    

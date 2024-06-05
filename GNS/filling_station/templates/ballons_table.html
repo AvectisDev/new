@@ -47,16 +47,16 @@
         </span>
     </div>
 
-    <div align="center"> 
+    <div > 
         <p>Количество баллонов: за текущую смену - {{ ballons_amount }}, за прошлую смену - {{ previous_ballons_amount }}</p>
         <p>Количество баллонов за {{ format_required_date }} - {{ required_date_amount }}</p>
     </div>
     
-    <div align="center">
-        <form class="some-class" method="post" enctype="multipart/form-data">
+    <div >
+        <form method="post" enctype="multipart/form-data">
            {% csrf_token %}
            {{ form }}
-           <button style="margin: 5% 2% 5% 5%;" type="submit">Отобразить</button>
+           <button class="btn btn-primary" style="margin: 5% 2% 5% 5%;" type="submit">Отобразить</button>
         </form>
    </div>
 
