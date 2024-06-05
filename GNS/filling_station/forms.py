@@ -19,7 +19,7 @@ class GetBallonsAmount(forms.Form):
 
     def clean_data(self):
         date_data = self.cleaned_data["date"]
-        if date_data is None:
+        if date_data is None or len(date_data) != 10:
             raise forms.ValidationError("Поле не может быть пустым")
         return date_data
     
