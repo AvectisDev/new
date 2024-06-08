@@ -14,5 +14,12 @@ class Process(forms.Form):
         return phone_number_data
 
 
-class OperatorControl(forms.Form):
-    n = 5
+class GetBallonsAmount(forms.Form):
+    date = forms.CharField(max_length=10, label="Дата", widget=forms.TextInput(attrs={'placeholder': 'дд.мм.гггг'}))
+
+    def clean_data(self):
+        date_data = self.cleaned_data["date"]
+        if date_data is None or len(date_data) != 10:
+            raise forms.ValidationError("Поле не может быть пустым")
+        return date_data
+    
