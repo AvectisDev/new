@@ -10,7 +10,7 @@ def write_nfc_tag(nfc_tag:str, status:str):
     """функция записывает в базу данных номер метки и дату проведения операции считывания"""
 
     try:
-        conn =  psycopg2.connect(dbname="PinskGNS", host="localhost", user="postgres", password=".avectis1", port="5432")
+        conn =  psycopg2.connect(dbname="LidaGNS", host="localhost", user="postgres", password=".avectis1", port="5432")
         conn.autocommit = True
 
         with conn.cursor() as cursor:
