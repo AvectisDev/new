@@ -21,7 +21,7 @@ def client(request):
     return render(request, "home.html", {"ballons": ballons})
 
 
-def apiGetBaallonPassport(request):
+def apiGetBalloonPassport(request):
     nfc = request.GET.get("nfc", 0)
     balloons = Ballon.objects.order_by('-id').filter(nfc_tag = nfc)
     # serialized_queryset = serializers.serialize('json', balloon)
@@ -41,21 +41,29 @@ def apiGetBaallonPassport(request):
 def reader_info(request, reader = '1'):
 
     if reader == '1':
-        status = 'Регистрация пустого баллона на складе (цех)'
+        status = 'Погрузка полного баллона на тралл 1 (RFID №1)'
     elif reader == '2':
-        status = 'Наполнение баллона сжиженным газом'
+        status = 'Погрузка полного баллона на тралл 2 (RFID №2)'
     elif reader == '3':
-        status = 'Регистрация пустого баллона на складе (рампа)'
+        status = 'Приёмка пустого баллона из тралла 1 (RFID №3)'
     elif reader == '4':
-        status = 'Регистрация полного баллона на складе'
+        status = 'Приёмка пустого баллона из тралла 2 (RFID №4)'
     elif reader == '5':
-        status = 'Погрузка полного баллона на тралл 2'
+        status = 'Регистрация полного баллона на складе (RFID №5)'
     elif reader == '6':
-        status = 'Погрузка полного баллона на тралл 1'
+        status = 'Регистрация пустого баллона в цеху (RFID №6)'
     elif reader == '7':
-        status = 'Погрузка полного баллона в кассету'
+        status = 'Наполнение баллона сжиженным газом. Карусель №1 (RFID №7)'
     elif reader == '8':
-        status = 'Регистрация пустого баллона на складе (из кассеты)'
+        status = 'Наполнение баллона сжиженным газом. Карусель №2 (RFID №8)'
+    elif reader == '9':
+        status = 'Вход в наполнительный цех из ремонтного (RFID №9)'
+    elif reader == '10':
+        status = 'Выход из наполнительного цеха в ремонтный (RFID №10)'
+    elif reader == '11':
+        status = 'Вход в ремонтный цех из наполнительного (RFID №11)'
+    elif reader == '12':
+        status = 'Выход из ремонтного цеха в наполнительный (RFID №12)'
 
     ballons = Ballon.objects.order_by('-id').filter(state = status)
     paginator = Paginator(ballons, 15)

@@ -81,7 +81,7 @@ WSGI_APPLICATION = 'GNS.wsgi.application'
 DATABASES = {
     "default": {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'PinskGNS',
+        'NAME': 'LidaGNS',
         'USER': 'postgres',
         'PASSWORD': '.avectis1',
         'HOST': 'localhost',
