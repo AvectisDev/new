@@ -1,11 +1,14 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
+from django.http import HttpRequest
 from django.core import serializers
 from django.core.paginator import Paginator
 from .models import Ballon
 from .admin import BallonResources
 from .forms import Process, GetBallonsAmount
 from datetime import datetime, date, time, timedelta
+from django.views.decorators.csrf import csrf_exempt
+import json
 import locale
 
 
@@ -20,7 +23,7 @@ def client(request):
     ballons = Ballon.objects.all()
     return render(request, "home.html", {"ballons": ballons})
 
-
+@csrf_exempt
 def apiGetBalloonPassport(request):
     nfc = request.GET.get("nfc", 0)
     balloons = Ballon.objects.order_by('-id').filter(nfc_tag = nfc)
@@ -34,8 +37,36 @@ def apiGetBalloonPassport(request):
         'full_weight':balloons[0].full_weight,
         'current_examination_date':balloons[0].current_examination_date,
         'next_examination_date':balloons[0].next_examination_date,
-        'state':balloons[0].state
-        })
+        'state':balloons[0].state})
+
+
+@csrf_exempt
+def apiUpdateBalloonPassport(request: HttpRequest) -> JsonResponse:
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+        nfc = data.get("nfc_tag")
+        balloon = Ballon.objects.filter(nfc_tag=nfc).first()
+
+        if not balloon:
+            return JsonResponse({'error': 'Balloon not found'}, status=404)
+
+        balloon.serial_number = data.get('serial_number')
+        balloon.creation_date = data.get('creation_date')
+        balloon.capacity = data.get('capacity')
+        balloon.empty_weight = data.get('empty_weight')
+        balloon.full_weight = data.get('full_weight')
+        balloon.current_examination_date = data.get('current_examination_date')
+        balloon.next_examination_date = data.get('next_examination_date')
+        balloon.state = data.get('state')
+
+        balloon.save()
+
+        return JsonResponse({'error': 'OK'}, status=200)
+
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+    return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
 
 
 def reader_info(request, reader = '1'):
@@ -84,14 +115,14 @@ def reader_info(request, reader = '1'):
         format_required_date = datetime.today()
 
     last_date_amount = len(ballons.filter(creation_date = datetime.today()))
-    previous_date_amount = len(ballons.filter(creation_date = datetime.today() - timedelta(days=1)))     
+    previous_date_amount = len(ballons.filter(creation_date = datetime.today() - timedelta(days=1)))
     required_date_amount = len(ballons.filter(creation_date = format_required_date))
 
     view_required_data = datetime.strftime(format_required_date, '%d.%m.%Y')
 
     return render(request, "ballons_table.html", {
-        "page_obj": page_obj, 
-        'ballons_amount': last_date_amount, 
+        "page_obj": page_obj,
+        'ballons_amount': last_date_amount,
         'previous_ballons_amount': previous_date_amount,
         'required_date_amount': required_date_amount,
         'format_required_date': view_required_data,
