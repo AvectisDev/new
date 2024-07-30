@@ -9,6 +9,8 @@ from .forms import Process, GetBallonsAmount
 from datetime import datetime, date, time, timedelta
 from django.views.decorators.csrf import csrf_exempt
 import json
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 import locale
 
 
@@ -23,7 +25,8 @@ def client(request):
     ballons = Ballon.objects.all()
     return render(request, "home.html", {"ballons": ballons})
 
-@csrf_exempt
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def apiGetBalloonPassport(request):
     nfc = request.GET.get("nfc", 0)
     balloons = Ballon.objects.order_by('-id').filter(nfc_tag = nfc)
@@ -40,7 +43,8 @@ def apiGetBalloonPassport(request):
         'state':balloons[0].state})
 
 
-@csrf_exempt
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def apiUpdateBalloonPassport(request: HttpRequest) -> JsonResponse:
     try:
         data = json.loads(request.body.decode('utf-8'))
