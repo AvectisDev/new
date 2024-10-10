@@ -1,98 +1,293 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse
-from django.core import serializers
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse
 from django.core.paginator import Paginator
-from .models import Ballon
-from .admin import BallonResources
-from .forms import Process, GetBallonsAmount
-from datetime import datetime, date, time, timedelta
-import locale
+from django.urls import reverse_lazy
+from django.views import generic
+
+from .models import (Balloon, Truck, Trailer, RailwayTank, TTN, BalloonsLoadingBatch, BalloonsUnloadingBatch,
+                     RailwayBatch, BalloonAmount, AutoGasBatch)
+from .admin import BalloonResources
+from .forms import (GetBalloonsAmount, BalloonForm, TruckForm, TrailerForm, RailwayTankForm, TTNForm,
+                    BalloonsLoadingBatchForm, BalloonsUnloadingBatchForm, RailwayBatchForm, AutoGasBatchForm)
+from datetime import datetime, timedelta
+
+STATUS_LIST = {
+    '1': 'Погрузка полного баллона на трал 1',
+    '2': 'Погрузка полного баллона на трал 2',
+    '3': 'Приёмка пустого баллона из трала 1',
+    '4': 'Приёмка пустого баллона из трала 2',
+    '5': 'Регистрация полного баллона на складе',
+    '6': 'Регистрация пустого баллона в цеху',
+    '7': 'Наполнение баллона сжиженным газом. Карусель №1',
+    '8': 'Наполнение баллона сжиженным газом. Карусель №2',
+    '9': 'Вход в наполнительный цех из ремонтного',
+    '10': 'Выход из наполнительного цеха в ремонтный',
+    '11': 'Вход в ремонтный цех из наполнительного',
+    '12': 'Выход из ремонтного цеха в наполнительный',
+}
 
 
-# locale.setlocale(locale.LC_TIME, "ru-RU")
+class BalloonListView(generic.ListView):
+    model = Balloon
+    paginate_by = 15
 
-def index(request):
-    ballons = Ballon.objects.all()
-    return render(request, "home.html", {"ballons": ballons})
+    def get_queryset(self):
+        nfc_tag_filter = self.request.GET.get('nfc_tag', '')
 
-
-def client(request):
-    ballons = Ballon.objects.all()
-    return render(request, "home.html", {"ballons": ballons})
-
-
-def apiGetBalloonPassport(request):
-    nfc = request.GET.get("nfc", 0)
-    balloons = Ballon.objects.order_by('-id').filter(nfc_tag = nfc)
-    # serialized_queryset = serializers.serialize('json', balloon)
-    return JsonResponse({
-        'nfc_tag':balloons[0].nfc_tag,
-        'serial_number':balloons[0].serial_number,
-        'creation_date':balloons[0].creation_date,
-        'capacity':balloons[0].capacity,
-        'empty_weight':balloons[0].empty_weight,
-        'full_weight':balloons[0].full_weight,
-        'current_examination_date':balloons[0].current_examination_date,
-        'next_examination_date':balloons[0].next_examination_date,
-        'state':balloons[0].state
-        })
+        if nfc_tag_filter:
+            return Balloon.objects.filter(nfc_tag=nfc_tag_filter)
+        else:
+            return Balloon.objects.all()
 
 
-def reader_info(request, reader = '1'):
+class BalloonDetailView(generic.DetailView):
+    model = Balloon
 
-    if reader == '1':
-        status = 'Погрузка полного баллона на тралл 1 (RFID №1)'
-    elif reader == '2':
-        status = 'Погрузка полного баллона на тралл 2 (RFID №2)'
-    elif reader == '3':
-        status = 'Приёмка пустого баллона из тралла 1 (RFID №3)'
-    elif reader == '4':
-        status = 'Приёмка пустого баллона из тралла 2 (RFID №4)'
-    elif reader == '5':
-        status = 'Регистрация полного баллона на складе (RFID №5)'
-    elif reader == '6':
-        status = 'Регистрация пустого баллона в цеху (RFID №6)'
-    elif reader == '7':
-        status = 'Наполнение баллона сжиженным газом. Карусель №1 (RFID №7)'
-    elif reader == '8':
-        status = 'Наполнение баллона сжиженным газом. Карусель №2 (RFID №8)'
-    elif reader == '9':
-        status = 'Вход в наполнительный цех из ремонтного (RFID №9)'
-    elif reader == '10':
-        status = 'Выход из наполнительного цеха в ремонтный (RFID №10)'
-    elif reader == '11':
-        status = 'Вход в ремонтный цех из наполнительного (RFID №11)'
-    elif reader == '12':
-        status = 'Выход из ремонтного цеха в наполнительный (RFID №12)'
 
-    ballons = Ballon.objects.order_by('-id').filter(state = status)
-    paginator = Paginator(ballons, 15)
+class BalloonUpdateView(generic.UpdateView):
+    model = Balloon
+    form_class = BalloonForm
+    template_name = 'filling_station/_equipment_form.html'
+
+
+class BalloonDeleteView(generic.DeleteView):
+    model = Balloon
+    success_url = reverse_lazy("filling_station:balloon_list")
+    template_name = 'filling_station/balloon_confirm_delete.html'
+
+
+def reader_info(request, reader='1'):
+    current_date = datetime.now().date()
+    previous_date = current_date - timedelta(days=1)
+
+    if request.method == "POST":
+        required_date = request.POST.get("date")
+        format_required_date = datetime.strptime(required_date, '%Y-%m-%d')
+
+        dataset = BalloonResources().export(Balloon.objects.filter(status=STATUS_LIST[reader], change_date=format_required_date))
+        response = HttpResponse(dataset.xls, content_type='xls')
+        response['Content-Disposition'] = f'attachment; filename="RFID_1_{required_date}.xls"'
+
+        return response
+    else:
+        date_process = GetBalloonsAmount()
+
+    balloons_list = Balloon.objects.order_by('-change_date', '-change_time').filter(status=STATUS_LIST[reader])
+    current_quantity = BalloonAmount.objects.filter(reader_id=reader, change_date=current_date).first()
+    previous_quantity = BalloonAmount.objects.filter(reader_id=reader, change_date=previous_date).first()
+
+    if current_quantity is not None:
+        current_quantity_rfid = current_quantity.amount_of_rfid
+        current_quantity_balloons = current_quantity.amount_of_balloons
+    else:
+        current_quantity_rfid = 0
+        current_quantity_balloons = 0
+
+    if previous_quantity is not None:
+        previous_quantity_rfid = previous_quantity.amount_of_rfid
+        previous_quantity_balloons = previous_quantity.amount_of_balloons
+    else:
+        previous_quantity_rfid = 0
+        previous_quantity_balloons = 0
+
+    paginator = Paginator(balloons_list, 15)
     page_num = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_num)
 
-    date_process = GetBallonsAmount()
-    if request.method == "POST":
-        required_date = request.POST.get("date")
-        format_required_date = datetime.strptime(required_date, '%d.%m.%Y')
+    context = {
+        "page_obj": page_obj,
+        'current_quantity_by_reader': current_quantity_rfid,
+        'previous_quantity_by_reader': previous_quantity_rfid,
+        'current_quantity_by_sensor': current_quantity_balloons,
+        'previous_quantity_by_sensor': previous_quantity_balloons,
+        'form': date_process,
+        'reader': reader
+    }
+    return render(request, "rfid_tables.html", context)
 
-        dataset = BallonResources().export(Ballon.objects.filter(state = status, creation_date = format_required_date))
-        response = HttpResponse(dataset.xls, content_type='xls')
-        response['Content-Disposition'] = f'attachment; filename="RFID_1_{datetime.strftime(format_required_date, '%Y.%m.%d')}.xls"'
-        return response
-    else:
-        date_process = GetBallonsAmount()
-        format_required_date = datetime.today()
 
-    last_date_amount = len(ballons.filter(creation_date = datetime.today()))
-    previous_date_amount = len(ballons.filter(creation_date = datetime.today() - timedelta(days=1)))     
-    required_date_amount = len(ballons.filter(creation_date = format_required_date))
+# Партии приёмки баллонов
+class BalloonLoadingBatchListView(generic.ListView):
+    model = BalloonsLoadingBatch
+    paginate_by = 15
+    template_name = 'filling_station/balloon_batch_list.html'
 
-    view_required_data = datetime.strftime(format_required_date, '%d.%m.%Y')
 
-    return render(request, "ballons_table.html", {
-        "page_obj": page_obj, 
-        'ballons_amount': last_date_amount, 
-        'previous_ballons_amount': previous_date_amount,
-        'required_date_amount': required_date_amount,
-        'format_required_date': view_required_data,
-        'form': date_process})
+class BalloonLoadingBatchDetailView(generic.DetailView):
+    model = BalloonsLoadingBatch
+    context_object_name = 'batch'
+    template_name = 'filling_station/balloon_batch_detail.html'
+
+
+class BalloonLoadingBatchUpdateView(generic.UpdateView):
+    model = BalloonsLoadingBatch
+    form_class = BalloonsLoadingBatchForm
+    template_name = 'filling_station/_equipment_form.html'
+
+
+class BalloonLoadingBatchDeleteView(generic.DeleteView):
+    model = BalloonsLoadingBatch
+    success_url = reverse_lazy("filling_station:balloon_loading_batch_list")
+    template_name = 'filling_station/balloons_loading_batch_confirm_delete.html'
+
+
+# Партии отгрузки баллонов
+class BalloonUnloadingBatchListView(generic.ListView):
+    model = BalloonsUnloadingBatch
+    paginate_by = 15
+    template_name = 'filling_station/balloon_batch_list.html'
+
+
+class BalloonUnloadingBatchDetailView(generic.DetailView):
+    model = BalloonsUnloadingBatch
+    context_object_name = 'batch'
+    template_name = 'filling_station/balloon_batch_detail.html'
+
+
+class BalloonUnloadingBatchUpdateView(generic.UpdateView):
+    model = BalloonsUnloadingBatch
+    form_class = BalloonsUnloadingBatchForm
+    template_name = 'filling_station/_equipment_form.html'
+
+
+class BalloonUnloadingBatchDeleteView(generic.DeleteView):
+    model = BalloonsUnloadingBatch
+    success_url = reverse_lazy("filling_station:balloon_unloading_batch_list")
+    template_name = 'filling_station/balloons_unloading_batch_confirm_delete.html'
+
+
+# Партии автоцистерн
+class AutoGasBatchListView(generic.ListView):
+    model = AutoGasBatch
+    paginate_by = 15
+    template_name = 'filling_station/auto_batch_list.html'
+
+
+class AutoGasBatchDetailView(generic.DetailView):
+    model = AutoGasBatch
+    context_object_name = 'batch'
+    template_name = 'filling_station/auto_batch_detail.html'
+
+
+class AutoGasBatchUpdateView(generic.UpdateView):
+    model = AutoGasBatch
+    form_class = AutoGasBatchForm
+    template_name = 'filling_station/_equipment_form.html'
+
+
+class AutoGasBatchDeleteView(generic.DeleteView):
+    model = AutoGasBatch
+    success_url = reverse_lazy("filling_station:auto_gas_batch_list")
+    template_name = 'filling_station/auto_batch_confirm_delete.html'
+
+
+# Партии приёмки газа в ж/д цистернах
+class RailwayBatchListView(generic.ListView):
+    model = RailwayBatch
+    paginate_by = 15
+    template_name = 'filling_station/railway_batch_list.html'
+
+
+class RailwayBatchDetailView(generic.DetailView):
+    model = RailwayBatch
+    context_object_name = 'batch'
+    template_name = 'filling_station/railway_batch_detail.html'
+
+
+class RailwayBatchUpdateView(generic.UpdateView):
+    model = RailwayBatch
+    form_class = RailwayBatchForm
+    template_name = 'filling_station/_equipment_form.html'
+
+
+class RailwayBatchDeleteView(generic.DeleteView):
+    model = RailwayBatch
+    success_url = reverse_lazy("filling_station:railway_batch_list")
+    template_name = 'filling_station/railway_batch_confirm_delete.html'
+
+
+# Грузовики
+class TruckView(generic.ListView):
+    model = Truck
+    paginate_by = 15
+
+
+class TruckDetailView(generic.DetailView):
+    model = Truck
+
+
+class TruckUpdateView(generic.UpdateView):
+    model = Truck
+    form_class = TruckForm
+    template_name = 'filling_station/_equipment_form.html'
+
+
+class TruckDeleteView(generic.DeleteView):
+    model = Truck
+    success_url = reverse_lazy("filling_station:truck_list")
+    template_name = 'filling_station/truck_confirm_delete.html'
+
+
+# Прицепы
+class TrailerView(generic.ListView):
+    model = Trailer
+    paginate_by = 15
+
+
+class TrailerDetailView(generic.DetailView):
+    model = Trailer
+
+
+class TrailerUpdateView(generic.UpdateView):
+    model = Trailer
+    form_class = TrailerForm
+    template_name = 'filling_station/_equipment_form.html'
+
+
+class TrailerDeleteView(generic.DeleteView):
+    model = Trailer
+    success_url = reverse_lazy("filling_station:trailer_list")
+    template_name = 'filling_station/trailer_confirm_delete.html'
+
+
+# ж/д цистерны
+class RailwayTankView(generic.ListView):
+    model = RailwayTank
+    paginate_by = 15
+
+
+class RailwayTankDetailView(generic.DetailView):
+    model = RailwayTank
+
+
+class RailwayTankUpdateView(generic.UpdateView):
+    model = RailwayTank
+    form_class = RailwayTankForm
+    template_name = 'filling_station/_equipment_form.html'
+
+
+class RailwayTankDeleteView(generic.DeleteView):
+    model = RailwayTank
+    success_url = reverse_lazy("filling_station:railway_tank_list")
+
+
+# ТТН
+class TTNView(generic.ListView):
+    model = TTN
+    paginate_by = 15
+
+
+class TTNDetailView(generic.DetailView):
+    model = TTN
+
+
+class TTNUpdateView(generic.UpdateView):
+    model = TTN
+    form_class = TTNForm
+    template_name = 'filling_station/_equipment_form.html'
+
+
+class TTNDeleteView(generic.DeleteView):
+    model = TTN
+    success_url = reverse_lazy("filling_station:ttn_list")
+    template_name = 'filling_station/ttn_confirm_delete.html'

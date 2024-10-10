@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %} Данные с RFID {% endblock %}
+
+{% block content %}
+
+<div>
+    <h5>Данные со считывателя №{{reader}} </h5>
+    <div>
+        <table class="table table-striped table-hover vertical-align: middle"
+               style="border-radius: 5px; overflow: hidden;">
+            <tr class="table-dark" align="center"
+                style="background-color: #051831 !important; color: white !important;">
+                <th>RFID метка</th>
+                <th>Серийный номер</th>
+                <th>Вес НЕТТО</th>
+                <th>Вес БРУТТО</th>
+                <th>Статус</th>
+                <th>Дата изменения</th>
+                <th>Время изменения</th>
+            </tr>
+            {% for balloon in page_obj.object_list %}
+            <tr align="center">
+                <td>
+                    <a href="{{ balloon.get_absolute_url }}" style="color: #051831;"> {{ balloon.nfc_tag }} </a>
+                </td>
+                <td>{{ balloon.serial_number|default_if_none:"-" }}</td>
+                <td>{{ balloon.netto|default_if_none:"-" }}</td>
+                <td>{{ balloon.brutto|default_if_none:"-" }}</td>
+                <td>{{ balloon.status|default_if_none:"-" }}</td>
+                <td>{{ balloon.change_date|default_if_none:"-" }}</td>
+                <td>{{ balloon.change_time|default_if_none:"-" }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    {% include 'filling_station/_paginator.html' %}
+    <div>
+        <p>Количество баллонов за текущую смену: RFID-считыватель - {{ current_quantity_by_reader }}, оптический датчик
+            - {{ current_quantity_by_sensor }}</p>
+        <p>Количество баллонов за прошлую смену: RFID-считыватель - {{ previous_quantity_by_reader }}, оптический датчик
+            - {{ previous_quantity_by_sensor }}</p>
+    </div>
+
+    <div class="container-fluid">
+        <form method="post" enctype="multipart/form-data" class="row align-items-center">
+            {% csrf_token %}
+            <div class="col-auto">
+                {{ form }}
+            </div>
+            <div class="col-auto">
+                <button class="btn" style="margin: 2% 2% 2% 2%; background-color: #3CBBD9; color: white;" type="submit">
+                    Выгрузить список баллонов
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock content %}
