@@ -68,6 +68,7 @@ urlpatterns = [
     path('ttn/<pk>/delete/', views.TTNDeleteView.as_view(), name="ttn_delete"),
 
     path('transport/trucks', views.TruckView.as_view(), name="truck_list"),
+    path('transport/trucks/create', views.TruckCreateView.as_view(), name="truck_create"),
     path('transport/trucks/<pk>', views.TruckDetailView.as_view(), name="truck_detail"),
     path('transport/trucks/<pk>/update/',
          views.TruckUpdateView.as_view(extra_context={
@@ -77,6 +78,7 @@ urlpatterns = [
     path('transport/trucks/<pk>/delete/', views.TruckDeleteView.as_view(), name="truck_delete"),
 
     path('transport/trailers', views.TrailerView.as_view(), name="trailer_list"),
+    path('transport/trailers/create', views.TrailerCreateView.as_view(), name="trailer_create"),
     path('transport/trailers/<pk>', views.TrailerDetailView.as_view(), name="trailer_detail"),
     path('transport/trailers/<pk>/update/', views.TrailerUpdateView.as_view(extra_context={
         "title": "Редактирование прицепа"

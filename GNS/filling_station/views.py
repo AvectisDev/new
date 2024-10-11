@@ -216,6 +216,13 @@ class TruckDetailView(generic.DetailView):
     model = Truck
 
 
+class TruckCreateView(generic.CreateView):
+    model = Truck
+    form_class = TruckForm
+    template_name = 'filling_station/_equipment_form.html'
+    success_url = reverse_lazy("filling_station:truck_list")
+
+
 class TruckUpdateView(generic.UpdateView):
     model = Truck
     form_class = TruckForm
@@ -236,6 +243,13 @@ class TrailerView(generic.ListView):
 
 class TrailerDetailView(generic.DetailView):
     model = Trailer
+
+
+class TrailerCreateView(generic.CreateView):
+    model = Trailer
+    form_class = TrailerForm
+    template_name = 'filling_station/_equipment_form.html'
+    success_url = reverse_lazy("filling_station:truck_list")
 
 
 class TrailerUpdateView(generic.UpdateView):
