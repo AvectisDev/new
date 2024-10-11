@@ -1,7 +1,7 @@
 import aiohttp
 import asyncio
 
-BASE_URL = "http://192.168.100.248:8000/api"  # server address
+BASE_URL = "http://192.168.66.248:8000/api"  # server address
 USERNAME = "reader"
 PASSWORD = "rfid-device"
 
