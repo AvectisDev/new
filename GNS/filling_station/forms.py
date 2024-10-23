@@ -2,6 +2,7 @@ from crispy_forms.bootstrap import StrictButton
 from django import forms
 from .models import (Balloon, Truck, Trailer, RailwayTank, TTN, BalloonsLoadingBatch, BalloonsUnloadingBatch,
                      RailwayBatch, AutoGasBatch)
+from .models import GAS_TYPE_CHOICES, BATCH_TYPE_CHOICES, BALLOON_SIZE_CHOICES
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout
 
@@ -18,16 +19,6 @@ USER_STATUS_LIST = [
     ('Утечка газа', 'Утечка газа'),
     ('Опорожнение(слив) баллона', 'Опорожнение(слив) баллона'),
     ('Контрольное взвешивание', 'Контрольное взвешивание'),
-]
-GAS_TYPE_CHOICES = [
-    ('Не выбран', 'Не выбран'),
-    ('СПБТ', 'СПБТ'),
-    ('ПБА', 'ПБА'),
-]
-
-BATCH_TYPE_CHOICES = [
-    ('l', 'Приёмка'),
-    ('u', 'Отгрузка'),
 ]
 
 
@@ -58,17 +49,19 @@ class BalloonForm(forms.ModelForm):
     class Meta:
         model = Balloon
         fields = ['nfc_tag', 'serial_number', 'creation_date', 'size', 'netto', 'brutto', 'current_examination_date',
-                  'next_examination_date', 'status', 'manufacturer', 'wall_thickness', 'filling_status',
-                  'update_passport_required']
+                  'next_examination_date', 'diagnostic_date', 'working_pressure', 'status', 'manufacturer',
+                  'wall_thickness', 'filling_status', 'update_passport_required']
         widgets = {
             'nfc_tag': forms.TextInput(attrs={'class': 'form-control'}),
             'serial_number': forms.TextInput(attrs={'class': 'form-control'}),
             'creation_date': forms.DateInput(attrs={'type': 'date'}),
-            'size': forms.NumberInput(attrs={'class': 'form-control'}),
+            'size': forms.Select(choices=BALLOON_SIZE_CHOICES, attrs={'class': 'form-control'}),
             'netto': forms.NumberInput(attrs={'class': 'form-control'}),
             'brutto': forms.NumberInput(attrs={'class': 'form-control'}),
             'current_examination_date': forms.DateInput(format='%Y-%m-%d', attrs={'type': 'date'}),
             'next_examination_date': forms.DateInput(format='%Y-%m-%d', attrs={'type': 'date'}),
+            'diagnostic_date': forms.DateInput(format='%Y-%m-%d', attrs={'type': 'date'}),
+            'working_pressure': forms.NumberInput(attrs={'class': 'form-control'}),
             'status': forms.Select(choices=USER_STATUS_LIST, attrs={'class': 'form-control'}),
             'manufacturer': forms.TextInput(attrs={'class': 'form-control'}),
             'wall_thickness': forms.NumberInput(attrs={'class': 'form-control'}),
@@ -95,7 +88,7 @@ class TruckForm(forms.ModelForm):
         widgets = {
             'car_brand': forms.TextInput(attrs={'class': 'form-control'}),
             'registration_number': forms.TextInput(attrs={'class': 'form-control'}),
-            'type': forms.TextInput(attrs={'class': 'form-control'}),
+            'type': forms.Select(attrs={'class': 'form-control'}),
             'capacity_cylinders': forms.NumberInput(attrs={'class': 'form-control'}),
             'max_weight_of_transported_cylinders': forms.NumberInput(attrs={'class': 'form-control'}),
             'max_mass_of_transported_gas': forms.NumberInput(attrs={'class': 'form-control'}),
@@ -129,7 +122,7 @@ class TrailerForm(forms.ModelForm):
             'truck': forms.Select(attrs={'class': 'form-control'}),
             'trailer_brand': forms.TextInput(attrs={'class': 'form-control'}),
             'registration_number': forms.TextInput(attrs={'class': 'form-control'}),
-            'type': forms.TextInput(attrs={'class': 'form-control'}),
+            'type': forms.Select(attrs={'class': 'form-control'}),
             'capacity_cylinders': forms.NumberInput(attrs={'class': 'form-control'}),
             'max_weight_of_transported_cylinders': forms.NumberInput(attrs={'class': 'form-control'}),
             'max_mass_of_transported_gas': forms.NumberInput(attrs={'class': 'form-control'}),

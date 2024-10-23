@@ -1,10 +1,22 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from . import api
 from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView)
 from django.views.decorators.csrf import csrf_exempt
 
 
 app_name = 'filling_station'
+
+
+balloons_loading_router = DefaultRouter()
+balloons_loading_router.register(r'balloons-loading',
+                                 api.BalloonsLoadingBatchViewSet,
+                                 basename='balloons-loading')
+
+balloons_unloading_router = DefaultRouter()
+balloons_unloading_router.register(r'balloons-unloading',
+                                   api.BalloonsUnloadingBatchViewSet,
+                                   basename='balloons-unloading')
 
 urlpatterns = [
     path('balloon-passport', api.BalloonView.as_view()),
@@ -16,13 +28,8 @@ urlpatterns = [
     path('trailers', api.TrailerView.as_view()),
     path('railway-tanks', api.RailwayTanksView.as_view()),
 
-    path('balloons-loading', api.BalloonsLoadingBatchView.as_view()),
-    path('balloons-loading/add-balloon', api.add_balloon_to_loading_batch),
-    path('balloons-loading/remove-balloon', api.remove_balloon_from_loading_batch),
-
-    path('balloons-unloading', api.BalloonsUnloadingBatchView.as_view()),
-    path('balloons-unloading/add-balloon', api.add_balloon_to_unloading_batch),
-    path('balloons-unloading/remove-balloon', api.remove_balloon_from_unloading_batch),
+    path('', include(balloons_loading_router.urls)),
+    path('', include(balloons_unloading_router.urls)),
 
     path('railway-loading', api.RailwayBatchView.as_view()),
     path('auto-gas', api.AutoGasBatchView.as_view()),

@@ -60,6 +60,7 @@ urlpatterns = [
     path('batch/auto-gas/<pk>/delete/', views.AutoGasBatchDeleteView.as_view(), name="auto_gas_batch_delete"),
 
     path('ttn', views.TTNView.as_view(), name="ttn_list"),
+    path('ttn/create', views.TTNCreateView.as_view(), name="ttn_create"),
     path('ttn/<pk>', views.TTNDetailView.as_view(), name="ttn_detail"),
     path('ttn/<pk>/update/', views.TTNUpdateView.as_view(extra_context={
         "title": "Редактирование ТТН"
@@ -87,6 +88,7 @@ urlpatterns = [
     path('transport/trailers/<pk>/delete/', views.TrailerDeleteView.as_view(), name="trailer_delete"),
 
     path('transport/railway_tanks', views.RailwayTankView.as_view(), name="railway_tank_list"),
+    path('transport/railway_tanks/create', views.RailwayTankCreateView.as_view(), name="railway_tank_create"),
     path('transport/railway_tanks/<pk>', views.RailwayTankDetailView.as_view(), name="railway_tank_detail"),
     path('transport/railway_tanks/<pk>/update/', views.RailwayTankUpdateView.as_view(extra_context={
         "title": "Редактирование ж/д цистерны"

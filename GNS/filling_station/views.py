@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.core.paginator import Paginator
 from django.urls import reverse_lazy
 from django.views import generic
-
+from django.db.models import Q
 from .models import (Balloon, Truck, Trailer, RailwayTank, TTN, BalloonsLoadingBatch, BalloonsUnloadingBatch,
                      RailwayBatch, BalloonAmount, AutoGasBatch)
 from .admin import BalloonResources
@@ -32,10 +32,12 @@ class BalloonListView(generic.ListView):
     paginate_by = 15
 
     def get_queryset(self):
-        nfc_tag_filter = self.request.GET.get('nfc_tag', '')
+        query = self.request.GET.get('query', '')
 
-        if nfc_tag_filter:
-            return Balloon.objects.filter(nfc_tag=nfc_tag_filter)
+        if query:
+            return Balloon.objects.filter(
+                Q(nfc_tag=query) | Q(serial_number=query)
+            )
         else:
             return Balloon.objects.all()
 
@@ -244,12 +246,12 @@ class TrailerView(generic.ListView):
 class TrailerDetailView(generic.DetailView):
     model = Trailer
 
-
+    
 class TrailerCreateView(generic.CreateView):
     model = Trailer
     form_class = TrailerForm
     template_name = 'filling_station/_equipment_form.html'
-    success_url = reverse_lazy("filling_station:truck_list")
+    success_url = reverse_lazy("filling_station:trailer_list")
 
 
 class TrailerUpdateView(generic.UpdateView):
@@ -273,6 +275,13 @@ class RailwayTankView(generic.ListView):
 class RailwayTankDetailView(generic.DetailView):
     model = RailwayTank
 
+    
+class RailwayTankCreateView(generic.CreateView):
+    model = RailwayTank
+    form_class = RailwayTankForm
+    template_name = 'filling_station/_equipment_form.html'
+    success_url = reverse_lazy("filling_station:railway_tank_list")
+
 
 class RailwayTankUpdateView(generic.UpdateView):
     model = RailwayTank
@@ -283,6 +292,7 @@ class RailwayTankUpdateView(generic.UpdateView):
 class RailwayTankDeleteView(generic.DeleteView):
     model = RailwayTank
     success_url = reverse_lazy("filling_station:railway_tank_list")
+    template_name = 'filling_station/railway_tank_confirm_delete.html'
 
 
 # ТТН
@@ -293,6 +303,13 @@ class TTNView(generic.ListView):
 
 class TTNDetailView(generic.DetailView):
     model = TTN
+
+    
+class TTNCreateView(generic.CreateView):
+    model = TTN
+    form_class = TTNForm
+    template_name = 'filling_station/_equipment_form.html'
+    success_url = reverse_lazy("filling_station:ttn_list")
 
 
 class TTNUpdateView(generic.UpdateView):
