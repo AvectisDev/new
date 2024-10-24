@@ -27,47 +27,8 @@ USER_STATUS_LIST = [
     'Опорожнение(слив) баллона',
     'Контрольное взвешивание'
 ]
-BALLOONS_LOADING_READER_LIST = [1, 6]
-BALLOONS_UNLOADING_READER_LIST = [2, 3, 4]
-
-#
-# class BalloonView(APIView):
-#     permission_classes = [IsAuthenticated]
-#
-#     def get(self, request):
-#         nfc_tag = request.query_params.get('nfc_tag', False)
-#         serial_number = request.query_params.get('serial_number', False)
-#
-#         if nfc_tag:
-#             balloon = get_object_or_404(Balloon, nfc_tag=nfc_tag)
-#             serializer = BalloonSerializer(balloon)
-#             return Response(serializer.data)
-#
-#         elif serial_number:
-#             balloons = Balloon.objects.filter(serial_number=serial_number)
-#             if not balloons:
-#                 return Response(status=status.HTTP_404_NOT_FOUND)
-#             serializer = BalloonSerializer(balloons, many=True)
-#             return Response(serializer.data)
-#
-#         return Response(status=status.HTTP_400_BAD_REQUEST)
-#
-#     def post(self, request):
-#         serializer = BalloonSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#
-#     def patch(self, request):
-#         nfc_tag = request.query_params.get('nfc_tag')
-#         balloon = get_object_or_404(Balloon, nfc_tag=nfc_tag)
-#
-#         serializer = BalloonSerializer(balloon, data=request.data, partial=True)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+BALLOONS_LOADING_READER_LIST = [3, 4]
+BALLOONS_UNLOADING_READER_LIST = [1, 2]
 
 
 class BalloonViewSet(viewsets.ViewSet):

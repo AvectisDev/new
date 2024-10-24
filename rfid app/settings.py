@@ -9,7 +9,7 @@ READER_LIST[0] = {
     'status': 'Погрузка полного баллона на трал 1',
     'input_state': 0,
     'previous_nfc_tags': [],
-    'function': 'loading',
+    'function': 'unloading',
     'batch': {'batch_id': 0, 'balloon_id': 0}
 }
 
@@ -34,7 +34,7 @@ READER_LIST[2] = {
     'status': 'Приёмка пустого баллона из трала 1',
     'input_state': 0,
     'previous_nfc_tags': [],
-    'function': 'unloading',
+    'function': 'loading',
     'batch': {'batch_id': 0, 'balloon_id': 0}
 }
 
@@ -46,7 +46,7 @@ READER_LIST[3] = {
     'status': 'Приёмка пустого баллона из трала 2',
     'input_state': 0,
     'previous_nfc_tags': [],
-    'function': 'unloading',
+    'function': 'loading',
     'batch': {'batch_id': 0, 'balloon_id': 0}
 }
 

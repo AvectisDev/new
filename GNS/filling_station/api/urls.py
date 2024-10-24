@@ -21,7 +21,6 @@ balloons_router.register(r'balloons', api.BalloonViewSet, basename='balloons')
 
 urlpatterns = [
     path('', include(balloons_router.urls)),
-    # path('balloon-passport', api.BalloonView.as_view()),
     path('balloon-status-options', api.get_balloon_status_options),
     path('loading-balloon-reader-list', api.get_loading_balloon_reader_list),
     path('unloading-balloon-reader-list', api.get_unloading_balloon_reader_list),
