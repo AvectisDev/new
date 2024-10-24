@@ -47,11 +47,15 @@ class BalloonViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def create(self, request):
-        serializer = BalloonSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        nfc_tag = request.data.get('nfc_tag', None)
+        balloons = Balloon.objects.filter(nfc_tag=nfc_tag)
+        if not balloons:
+            serializer = BalloonSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_409_CONFLICT)
 
     def partial_update(self, request, pk=None):
         balloon = get_object_or_404(Balloon, id=pk)
