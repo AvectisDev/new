@@ -70,7 +70,7 @@ READER_LIST[5] = {
     'status': 'Регистрация пустого баллона в цеху',
     'input_state': 0,
     'previous_nfc_tags': [],
-    'function': 'loading',
+    'function': None,
     'batch': {'batch_id': 0, 'balloon_id': 0}
 }
 
