@@ -35,13 +35,13 @@ class BalloonViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     @action(detail=False, methods=['get'], url_path='nfc/(?P<nfc_tag>[^/.]+)')
-    def nfc(self, request, nfc_tag=None):
+    def get_by_nfc(self, request, nfc_tag=None):
         balloon = get_object_or_404(Balloon, nfc_tag=nfc_tag)
         serializer = BalloonSerializer(balloon)
         return Response(serializer.data)
 
     @action(detail=False, methods=['get'], url_path='serial-number/(?P<serial_number>[^/.]+)')
-    def serial_number(self, request, serial_number=None):
+    def get_by_serial_number(self, request, serial_number=None):
         balloons = Balloon.objects.filter(serial_number=serial_number)
         serializer = BalloonSerializer(balloons, many=True)
         return Response(serializer.data)
