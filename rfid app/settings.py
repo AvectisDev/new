@@ -9,8 +9,7 @@ READER_LIST[0] = {
     'status': 'Погрузка полного баллона на трал 1',
     'input_state': 0,
     'previous_nfc_tags': [],
-    'function': 'unloading',
-    'batch': {'batch_id': 0, 'balloon_id': 0}
+    'function': 'unloading'
 }
 
 # 2-й ближе к цеху
@@ -21,8 +20,7 @@ READER_LIST[1] = {
     'status': 'Погрузка полного баллона на трал 2',
     'input_state': 0,
     'previous_nfc_tags': [],
-    'function': 'unloading',
-    'batch': {'batch_id': 0, 'balloon_id': 0}
+    'function': 'unloading'
 }
 
 # Считыватели на приёмке
@@ -34,8 +32,7 @@ READER_LIST[2] = {
     'status': 'Приёмка пустого баллона из трала 1',
     'input_state': 0,
     'previous_nfc_tags': [],
-    'function': 'loading',
-    'batch': {'batch_id': 0, 'balloon_id': 0}
+    'function': 'loading'
 }
 
 # 4-й ближе к цеху
@@ -46,8 +43,7 @@ READER_LIST[3] = {
     'status': 'Приёмка пустого баллона из трала 2',
     'input_state': 0,
     'previous_nfc_tags': [],
-    'function': 'loading',
-    'batch': {'batch_id': 0, 'balloon_id': 0}
+    'function': 'loading'
 }
 
 # Выход из наполнительного цеха
@@ -58,8 +54,7 @@ READER_LIST[4] = {
     'status': 'Регистрация полного баллона на складе',
     'input_state': 0,
     'previous_nfc_tags': [],
-    'function': None,
-    'batch': {'batch_id': 0, 'balloon_id': 0}
+    'function': None
 }
 
 # Вход в наполнительный цех
@@ -70,8 +65,7 @@ READER_LIST[5] = {
     'status': 'Регистрация пустого баллона в цеху',
     'input_state': 0,
     'previous_nfc_tags': [],
-    'function': None,
-    'batch': {'batch_id': 0, 'balloon_id': 0}
+    'function': None
 }
 
 # Считыватели в цеху
@@ -83,8 +77,7 @@ READER_LIST[6] = {
     'status': 'Наполнение баллона сжиженным газом. Карусель №1',
     'input_state': 0,
     'previous_nfc_tags': [],
-    'function': None,
-    'batch': {'batch_id': 0, 'balloon_id': 0}
+    'function': None
 }
 
 # Карусель №2
@@ -95,8 +88,7 @@ READER_LIST[7] = {
     'status': 'Наполнение баллона сжиженным газом. Карусель №2',
     'input_state': 0,
     'previous_nfc_tags': [],
-    'function': None,
-    'batch': {'batch_id': 0, 'balloon_id': 0}
+    'function': None
 }
 
 #
@@ -107,8 +99,7 @@ READER_LIST[8] = {
     'status': 'Вход в наполнительный цех из ремонтного',
     'input_state': 0,
     'previous_nfc_tags': [],
-    'function': None,
-    'batch': {'batch_id': 0, 'balloon_id': 0}
+    'function': None
 }
 
 #
@@ -119,8 +110,7 @@ READER_LIST[9] = {
     'status': 'Выход из наполнительного цеха в ремонтный',
     'input_state': 0,
     'previous_nfc_tags': [],
-    'function': None,
-    'batch': {'batch_id': 0, 'balloon_id': 0}
+    'function': None
 }
 
 #
@@ -131,8 +121,7 @@ READER_LIST[10] = {
     'status': 'Вход в ремонтный цех из наполнительного',
     'input_state': 0,
     'previous_nfc_tags': [],
-    'function': None,
-    'batch': {'batch_id': 0, 'balloon_id': 0}
+    'function': None
 }
 
 #
@@ -143,8 +132,7 @@ READER_LIST[11] = {
     'status': 'Выход из ремонтного цеха в наполнительный',
     'input_state': 0,
     'previous_nfc_tags': [],
-    'function': None,
-    'batch': {'batch_id': 0, 'balloon_id': 0}
+    'function': None
 }
 
 # Команды, посылаемые на считыватель
