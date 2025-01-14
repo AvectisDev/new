@@ -111,12 +111,12 @@ DATABASES = {
     }
 }
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://localhost:6379/1'
-    }
-}
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+#         'LOCATION': 'redis://localhost:6379/1'
+#     }
+# }
 
 # PGHISTORY_CONTEXT_FIELD = None
 
@@ -170,7 +170,7 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_BEAT_SCHEDULE = {
     'send_to_opc': {
         'task': 'filling_station.tasks.send_to_opc',
-        'schedule': 1.0,  # каждый час
+        'schedule': 10.0,  # каждый час
     },
 }
 

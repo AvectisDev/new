@@ -1,3 +1,4 @@
+import logging
 from ..models import (Balloon, BalloonAmount, BalloonsLoadingBatch, BalloonsUnloadingBatch)
 from django.shortcuts import get_object_or_404
 from asgiref.sync import sync_to_async
@@ -11,6 +12,9 @@ from .serializers import (BalloonSerializer, BalloonAmountSerializer,
                           BalloonsLoadingBatchSerializer, BalloonsUnloadingBatchSerializer,
                           ActiveLoadingBatchSerializer, ActiveUnloadingBatchSerializer,
                           BalloonAmountLoadingSerializer, BalloonAmountUnloadingSerializer)
+
+
+logger = logging.getLogger('filling_station')
 
 USER_STATUS_LIST = [
     'Создание паспорта баллона',
@@ -55,6 +59,7 @@ class BalloonViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=['post'], url_path='update-by-reader')
     def update_by_reader(self, request):
+        # logger.info('функция update-by-reader выполняется...')
         nfc_tag = request.data.get('nfc_tag')
         balloon, created = Balloon.objects.get_or_create(
             nfc_tag=nfc_tag,
