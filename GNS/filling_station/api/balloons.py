@@ -5,6 +5,7 @@ from rest_framework import generics, status, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, action
 from rest_framework.permissions import IsAuthenticated
+from filling_station.tasks import send_to_opc
 from datetime import datetime, date
 from .serializers import (BalloonSerializer, BalloonAmountSerializer,
                           BalloonsLoadingBatchSerializer, BalloonsUnloadingBatchSerializer,
@@ -65,7 +66,7 @@ class BalloonViewSet(viewsets.ViewSet):
         if not created:
             balloon.status = request.data.get('status')
             if balloon.update_passport_required:
-                balloon.update_passport_required = request.data.get('update_passport_required', None)
+                balloon.update_passport_required = request.data.get('update_passport_required', True)
                 balloon.serial_number = request.data.get('serial_number', None)
                 balloon.netto = request.data.get('netto', None)
                 balloon.brutto = request.data.get('brutto', None)
@@ -74,6 +75,10 @@ class BalloonViewSet(viewsets.ViewSet):
 
         reader_number = request.data.get('reader_number', None)
         reader_function = request.data.get('reader_function', None)
+
+        # Выполняем передачу данных в OPC сервер (лампочки на считывателях)
+        send_to_opc.delay(reader=reader_number, blink=balloon.update_passport_required)
+
         if reader_function:
             self.add_balloon_to_batch_from_reader(balloon, reader_number, reader_function)
 
