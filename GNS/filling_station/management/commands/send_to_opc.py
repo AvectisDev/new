@@ -37,9 +37,9 @@ class Command(BaseCommand):
             blink = options['blink']
 
             if blink:
-                self.set_opc_value(f"ns=3;s='RFID_{reader}_Blink_LED_DB'.'LED_Flash'", True)
+                self.set_opc_value(f'ns=3;s="RFID_LED"."RFID_LED_PULSE"[{reader - 1}]', True)
             else:
-                self.set_opc_value(f"ns=3;s='RFID_{reader}_Blink_LED_DB'.'LED_On'", True)
+                self.set_opc_value(f'ns=3;s="RFID_LED"."RFID_LED_ON"[{reader - 1}]', True)
 
             logger.info(f'Данные отправлены в OPC: reader-{reader};blink-{blink}')
 
