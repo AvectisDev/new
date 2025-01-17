@@ -34,14 +34,12 @@ urlpatterns = [
 
     path('trucks', transport.TruckView.as_view()),
     path('trailers', transport.TrailerView.as_view()),
-    path('railway-tanks', transport.RailwayTanksView.as_view()),
 
     path('', include(balloons_loading_router.urls)),
     path('', include(balloons_unloading_router.urls)),
 
     path('', include(balloons_amount_router.urls)),
 
-    path('railway-loading', transport.RailwayBatchView.as_view()),
     path('', include(auto_gas_router.urls)),
 
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

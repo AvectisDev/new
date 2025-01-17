@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from ..models import (Balloon, Truck, Trailer, RailwayTank, TTN, BalloonsLoadingBatch, BalloonsUnloadingBatch,
-                      RailwayBatch, AutoGasBatch, BalloonAmount)
+from ..models import (Balloon, Truck, Trailer, TTN, BalloonsLoadingBatch, BalloonsUnloadingBatch,
+                      AutoGasBatch, BalloonAmount)
 
 
 class BalloonSerializer(serializers.ModelSerializer):
@@ -36,13 +36,6 @@ class TrailerSerializer(serializers.ModelSerializer):
 
     def get_type(self, obj):
         return obj.type.type
-
-
-class RailwayTankSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = RailwayTank
-        fields = ['id', 'registration_number', 'empty_weight', 'full_weight', 'gas_weight', 'gas_type', 'is_on_station',
-                  'entry_date', 'entry_time', 'departure_date', 'departure_time']
 
 
 class TTNSerializer(serializers.ModelSerializer):
@@ -101,13 +94,6 @@ class BalloonAmountUnloadingSerializer(serializers.ModelSerializer):
     class Meta:
         model = BalloonsUnloadingBatch
         fields = ['id', 'amount_of_rfid']
-
-
-class RailwayBatchSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = RailwayBatch
-        fields = ['id', 'end_date', 'end_time', 'gas_amount_spbt', 'gas_amount_pba', 'railway_tank_list', 'is_active',
-                  'import_ttn', 'export_ttn']
 
 
 class AutoGasBatchSerializer(serializers.ModelSerializer):

@@ -9,9 +9,9 @@ import logging
 from concurrent.futures import ThreadPoolExecutor
 
 logging.basicConfig(
-    level=logging.INFO,  # Уровень логирования
+    level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
-    filename='rfid_app_logs.log',
+    filename='rfid.log',
     filemode='w',
     encoding='utf-8'
 )

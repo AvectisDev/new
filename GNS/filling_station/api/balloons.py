@@ -1,5 +1,5 @@
 import logging
-from ..models import (Balloon, BalloonAmount, BalloonsLoadingBatch, BalloonsUnloadingBatch)
+from ..models import Balloon, BalloonAmount, BalloonsLoadingBatch, BalloonsUnloadingBatch, Reader
 from django.shortcuts import get_object_or_404
 from asgiref.sync import sync_to_async
 from rest_framework import generics, status, viewsets
@@ -82,10 +82,15 @@ class BalloonViewSet(viewsets.ViewSet):
         reader_function = request.data.get('reader_function', None)
 
         # Выполняем передачу данных в OPC сервер (лампочки на считывателях)
+        logger.info(
+            f'данные в функции update-by-reader reader_number-{reader_number}, type of reader_number-{type(reader_number)};blink-{balloon.update_passport_required}, type of blink-{type(balloon.update_passport_required)}')
         send_to_opc.delay(reader=reader_number, blink=balloon.update_passport_required)
 
         if reader_function:
             self.add_balloon_to_batch_from_reader(balloon, reader_number, reader_function)
+
+        reader = Reader.objects.filter(number=reader_number)
+        reader.balloon_list.add(balloon)
 
         serializer = BalloonSerializer(balloon)
         return Response(serializer.data)

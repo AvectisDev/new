@@ -43,8 +43,11 @@ class Command(BaseCommand):
 
             logger.info(f'Данные отправлены в OPC: reader-{reader};blink-{blink}')
 
+        except ua.UaError as error:
+            logger.error(f'OPC server error: {error}')
         except Exception as error:
-            logger.error(f'No connection to OPC server: {error}')
+            logger.error(f'other error while OPC connection: {error}')
+            logger.error(f'reader-{reader}, type of reader-{type(reader)};blink-{blink}, type of blink-{type(blink)}')
         finally:
             self.client.disconnect()
             logger.info('Disconnect from OPC server')
