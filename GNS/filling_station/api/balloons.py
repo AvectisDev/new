@@ -83,14 +83,28 @@ class BalloonViewSet(viewsets.ViewSet):
 
         # Выполняем передачу данных в OPC сервер (лампочки на считывателях)
         logger.info(
-            f'данные в функции update-by-reader reader_number-{reader_number}, type of reader_number-{type(reader_number)};blink-{balloon.update_passport_required}, type of blink-{type(balloon.update_passport_required)}')
+            f'данные в функции update-by-reader reader_number-{reader_number},'
+            f'nfc_tag={nfc_tag} '
+            f'type of reader_number-{type(reader_number)}; '
+            f'blink-{balloon.update_passport_required}, '
+            f'type of blink-{type(balloon.update_passport_required)}'
+        )
         send_to_opc.delay(reader=reader_number, blink=balloon.update_passport_required)
 
+        # Если ридер стоит на приёмке или отгрузке, то добавляем текущий баллон в партию
         if reader_function:
             self.add_balloon_to_batch_from_reader(balloon, reader_number, reader_function)
 
-        reader = Reader.objects.filter(number=reader_number)
-        reader.balloon_list.add(balloon)
+        # Добавляем информацию по баллону в таблицу с ридерами
+        reader = Reader.objects.create(
+            number=reader_number,
+            nfc_tag=nfc_tag,
+            serial_number=balloon.serial_number,
+            size=balloon.size,
+            netto=balloon.netto,
+            brutto=balloon.brutto,
+            filling_status=balloon.filling_status
+        )
 
         serializer = BalloonSerializer(balloon)
         return Response(serializer.data)

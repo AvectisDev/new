@@ -67,7 +67,12 @@ class Balloon(models.Model):
 
 class Reader(models.Model):
     number = models.IntegerField(verbose_name="Номер считывателя")
-    balloon_list = models.ManyToManyField(Balloon, blank=True, verbose_name="Список баллонов")
+    nfc_tag = models.CharField(null=True, blank=True, max_length=30, verbose_name="Номер метки")
+    serial_number = models.CharField(null=True, blank=True, max_length=30, verbose_name="Серийный номер")
+    size = models.IntegerField(choices=BALLOON_SIZE_CHOICES, default=50, verbose_name="Объём")
+    netto = models.FloatField(null=True, blank=True, verbose_name="Вес пустого баллона")
+    brutto = models.FloatField(null=True, blank=True, verbose_name="Вес наполненного баллона")
+    filling_status = models.BooleanField(null=True, blank=True, verbose_name="Готов к наполнению")
     change_date = models.DateField(auto_now=True, verbose_name="Дата изменений")
     change_time = models.TimeField(auto_now=True, verbose_name="Время изменений")
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="Пользователь", default=1)
