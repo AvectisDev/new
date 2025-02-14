@@ -45,6 +45,10 @@ BALLOONS_UNLOADING_READER_LIST = [1, 2]
 
 class BalloonViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.logger = logging.getLogger(__name__)
 
     @action(detail=False, methods=['get'], url_path='nfc/(?P<nfc_tag>[^/.]+)')
     def get_by_nfc(self, request, nfc_tag=None):
