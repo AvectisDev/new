@@ -7,4 +7,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         subprocess.Popen(['python', '../rfid app/main.py'])
-        # subprocess.Popen(['python', '../rfid app/carousel.py'])
+        subprocess.Popen(['python', '../rfid app/carousel.py'])

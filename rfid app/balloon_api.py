@@ -1,4 +1,18 @@
 import aiohttp
+import requests
+import logging
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    filename='carousel.log',
+    filemode='w',
+    encoding='utf-8'
+)
+
+logger = logging.getLogger('carousel')
+logger.setLevel(logging.DEBUG)
 
 BASE_URL = "http://localhost:8000/api"  # server address
 USERNAME = "reader"
@@ -14,8 +28,27 @@ async def update_balloon(data):
                 return await response.json()
 
         except Exception as error:
-            print(f'update_balloon function error: {error}')
+            logger.error(f'update_balloon function error: {error}')
             return data
+
+
+def put_carousel_data(data: dict):
+    """
+    Функция работает как шлюз между сервером и постом наполнения, т.к. пост может слать запрос только через COM-порт в
+    виде набора байт по проприетарному протоколу. Функция отправляет POST-запрос с текущими показаниями поста карусели
+    на сервер. В ответ сервер должен прислать требуемый вес газа, которым нужно заправить баллон.
+    :param data: Содержит словарь с ключами 'request_type'-тип запроса с поста наполнения, 'post_number' -
+    номер поста наполнения, 'weight_combined'- текущий вес баллона, который находится на посту наполнения
+    :return: возвращает словарь со статусом ответа и весом баллона
+    """
+    try:
+        response = requests.post(f"{BASE_URL}/carousel-update", json=data, timeout=3)
+        response.raise_for_status()
+        return response.json()
+
+    except requests.exceptions.RequestException as error:
+        logger.error(f"put_carousel_data function error: {error}")
+        return None
 
 
 async def update_balloon_amount(from_who: str, data: dict):
@@ -39,5 +72,5 @@ async def update_balloon_amount(from_who: str, data: dict):
                 response.raise_for_status()
 
         except Exception as error:
-            print(f'update_balloon_amount function error: {error}')
+            logger.error(f'update_balloon_amount function error: {error}')
             return None

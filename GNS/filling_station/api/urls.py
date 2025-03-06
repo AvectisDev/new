@@ -31,6 +31,7 @@ urlpatterns = [
     path('balloon-status-options', balloons.get_balloon_status_options),
     path('loading-balloon-reader-list', balloons.get_loading_balloon_reader_list),
     path('unloading-balloon-reader-list', balloons.get_unloading_balloon_reader_list),
+    path('carousel-update', balloons.update_from_carousel),
 
     path('trucks', transport.TruckView.as_view()),
     path('trailers', transport.TrailerView.as_view()),

@@ -78,4 +78,6 @@ urlpatterns = [
     }),
          name="trailer_update"),
     path('transport/trailers/<pk>/delete/', views.TrailerDeleteView.as_view(), name="trailer_delete"),
+
+    path('carousel', views.CarouselListView.as_view(), name="carousel_list"),
 ]

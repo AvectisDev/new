@@ -1,22 +1,28 @@
 import asyncio
 import db
+import os
 import binascii
-from datetime import datetime
 from settings import READER_LIST, COMMANDS
-from miriada import get_balloon_by_nfc_tag as get_balloon
 import balloon_api
 import logging
 from concurrent.futures import ThreadPoolExecutor
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+LOGS_DIR = os.path.join(BASE_DIR, 'logs')
+# Создаём папку logs, если её нет
+if not os.path.exists(LOGS_DIR):
+    os.makedirs(LOGS_DIR)
+
+# Настройка логирования
 logging.basicConfig(
-    level=logging.INFO,  # Уровень логирования
+    level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
-    filename='rfid_app_logs.log',
+    filename=os.path.join(LOGS_DIR, 'rfid.log'),
     filemode='w',
     encoding='utf-8'
 )
 
-logger = logging.getLogger('app_logger')
+logger = logging.getLogger('rfid_logger')
 logger.setLevel(logging.DEBUG)
 
 
@@ -30,9 +36,12 @@ async def data_exchange_with_reader(controller: dict, command: str):
         writer.write(binascii.unhexlify(COMMANDS[command]))
         await writer.drain()
 
-        data = await reader.read(2048)
+        data = await asyncio.wait_for(reader.read(2048), timeout=2)
         buffer = binascii.hexlify(data).decode()
         return buffer
+    except asyncio.TimeoutError:
+        logger.error(f'Таймаут при ожидании ответа от контроллера {controller["ip"]}:{controller["port"]}')
+        return []
     except Exception as error:
         logger.debug(f'Нет связи с контроллером {controller["ip"]}:{controller["port"]}: {error}')
         return []

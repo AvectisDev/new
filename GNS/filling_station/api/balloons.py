@@ -1,15 +1,17 @@
 import logging
 import requests
-from ..models import Balloon, BalloonAmount, BalloonsLoadingBatch, BalloonsUnloadingBatch, Reader
+from ..models import Balloon, BalloonAmount, BalloonsLoadingBatch, BalloonsUnloadingBatch, Reader, Carousel
 from django.shortcuts import get_object_or_404
-from asgiref.sync import sync_to_async
+from django.core.cache import cache
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 from rest_framework import generics, status, viewsets
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, action, authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from filling_station.tasks import send_to_opc
 from datetime import datetime, date
-from .serializers import (BalloonSerializer, BalloonAmountSerializer,
+from .serializers import (BalloonSerializer, СarouselSerializer, BalloonAmountSerializer,
                           BalloonsLoadingBatchSerializer, BalloonsUnloadingBatchSerializer,
                           ActiveLoadingBatchSerializer, ActiveUnloadingBatchSerializer,
                           BalloonAmountLoadingSerializer, BalloonAmountUnloadingSerializer)
@@ -208,6 +210,68 @@ def get_loading_balloon_reader_list(request):
 @api_view(['GET'])
 def get_unloading_balloon_reader_list(request):
     return Response(BALLOONS_UNLOADING_READER_LIST)
+
+
+@api_view(['POST'])
+@authentication_classes([])  # Отключаем аутентификацию для этого метода, т.к. запросы должны проходить за <250мс
+@permission_classes([AllowAny])
+def update_from_carousel(request):
+    """
+
+    """
+    request_type = request.data.get('request_type')
+    post_number = request.data.get('post_number')
+    weight_combined = request.data.get('weight_combined')
+
+    # Уникальный ключ для кэширования запроса
+    cache_key = f"carousel_request_{request_type}_{post_number}_{weight_combined}"
+    cache_time = 1
+
+    if cache.get(cache_key):
+        logger.debug(f"Запрос уже обрабатывается: {request_type} {post_number} {weight_combined}")
+        return Response({"error": "Запрос уже обрабатывается"}, status=status.HTTP_202_ACCEPTED)
+
+    cache.set(cache_key, True, cache_time)
+
+    logger.debug(f"Обработка запроса от карусели {request_type} {post_number} {weight_combined}")
+    if not request_type:
+        logger.error("Тип запроса отсутствует в теле запроса")
+        return Response({"error": "Не указан тип запроса"}, status=status.HTTP_400_BAD_REQUEST)
+    if request_type == '0x7a':
+        try:
+            logger.debug(f'запрос типа 0x7a')
+            balloon = Reader.objects.filter(number=8).first()
+            if not balloon:
+                logger.error("Объект Reader с number=8 не найден")
+                return Response({"error": "В базе данных отсутствуют данные по 8 считывателю"}, status=status.HTTP_404_NOT_FOUND)
+
+            carousel_post = Сarousel.objects.create(
+                is_empty = True,
+                post_number=post_number,
+                empty_weight = weight_combined / 1000,
+                nfc_tag = balloon.nfc_tag,
+                serial_number = balloon.serial_number,
+                size = balloon.size,
+                netto = balloon.netto,
+                brutto = balloon.brutto,
+                filling_status = balloon.filling_status
+            )
+            serializer = СarouselSerializer(carousel_post)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except Exception as error:
+            logger.error(f'Ошибка при обработке запроса типа 0x7a - {error}')
+            return Response({"error": str(error)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    else:
+        try:
+            carousel_post = Сarousel.objects.filter(post_number=post_number).first()
+            carousel_post.is_empty = False
+            carousel_post.full_weight = weight_combined / 1000
+            carousel_post.save()
+            serializer = СarouselSerializer(carousel_post)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as error:
+            logger.error(f'Ошибка при обработке запроса типа 0x70 - {error}')
+            return Response({"error": str(error)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class BalloonsLoadingBatchViewSet(viewsets.ViewSet):

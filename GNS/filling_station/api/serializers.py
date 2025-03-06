@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from ..models import (Balloon, Truck, Trailer, TTN, BalloonsLoadingBatch, BalloonsUnloadingBatch,
+from ..models import (Balloon, Carousel, Truck, Trailer, TTN, BalloonsLoadingBatch, BalloonsUnloadingBatch,
                       AutoGasBatch, BalloonAmount)
 
 
@@ -9,6 +9,12 @@ class BalloonSerializer(serializers.ModelSerializer):
         fields = ['id', 'nfc_tag', 'serial_number', 'creation_date', 'size', 'netto', 'brutto',
                   'current_examination_date', 'next_examination_date', 'status', 'manufacturer', 'wall_thickness',
                   'filling_status', 'update_passport_required']
+
+
+class СarouselSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Carousel
+        fields = '__all__'
 
 
 class TruckSerializer(serializers.ModelSerializer):

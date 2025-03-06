@@ -1,18 +1,26 @@
+import os
 import serial
 import struct
 import logging
-from datetime import datetime
+import balloon_api
 
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+LOGS_DIR = os.path.join(BASE_DIR, 'logs')
+# Создаём папку logs, если её нет
+if not os.path.exists(LOGS_DIR):
+    os.makedirs(LOGS_DIR)
+
+# Настройка логирования
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
-    filename='carousel.log',
+    filename=os.path.join(LOGS_DIR, 'carousel.log'),
     filemode='w',
     encoding='utf-8'
 )
 
-logger = logging.getLogger('carousel')
+logger = logging.getLogger('carousel_logger')
 logger.setLevel(logging.DEBUG)
 
 # Функция для вычисления CRC-16/AUG-CCITT
@@ -41,60 +49,38 @@ ser = None
 
 def serial_exchange():
     try:
+        logger.debug(f"Запуск программы обработки УНБ...")
         # Создаем объект Serial для работы с COM-портом
         ser = serial.Serial(port, baud_rate, timeout=1)
         logger.debug(f"Соединение установлено на порту {port}.")
 
         while True:
-            # Читаем данные из COM-порта
+            # Читаем 8 байт данных из COM-порта
             data = ser.read(8)
-            if data:
-                # Выводим запрос в HEX формате
-                print(f"Получен запрос: {data.hex().upper()} - {datetime.now()}")
-                logger.debug(f"Получен запрос: {data.hex().upper()}")
 
-                # Расшифровываем запрос
+            if data:
+                # Расшифровываем каждый байт по отдельности
                 request_type = data[0]
                 post_number = data[1]
                 measurement_number = data[2]
-                # Измененная строка для вывода массы баллона
-                # Преобразуем четвертый и пятый байты в десятичное значение массы баллона
-                # weight_bytes = data[3:5]
                 # Преобразуем четвертый и пятый байты в десятичное значение массы баллона
                 weight_combined = (data[3] << 8) | data[4]
-                service_byte = data[5]
-                crc = int.from_bytes(data[6:8], byteorder='big')
+                service_byte = int.from_bytes(data[5:7], byteorder='little')
+                crc = int.from_bytes(data[6:8], byteorder='little')
 
-                logger.debug(f"Тип запроса: {hex(request_type)}")
-                logger.debug(f"Номер поста: {(post_number)}")
-                logger.debug(f"Номер измерения: {hex(measurement_number)}")
-                logger.debug(f"Масса баллона: {weight_combined} г")
-                logger.debug(f"Флаг: {hex(service_byte)}")
-                logger.debug(f"CRC: {hex(crc)}")
+                logger.debug(f"Получен запрос от поста. Тип запроса: {hex(request_type)}. Номер поста: {post_number}"
+                             f"Масса баллона: {weight_combined}")
 
-                # Формируем ответ
-                if request_type == 0x7A:
-                    response_type = 0x5A
-                elif request_type == 0x70:
-                    response_type = 0x50
-
-                # Формируем ответный пакет без CRC
-                response_data = struct.pack('<BBBHBH', response_type, post_number, 0xFF, 0x10A4, 0xFF, 0xFFFF)
-
-                # Вычисляем CRC-16/AUG-CCITT для ответа (без последних двух байт)
-                crc_t = calc_crc(response_data[:-2])
-                crc = ((crc_t & 0xFF) << 8) | ((crc_t >> 8) & 0xFF)
-
-                # Добавляем CRC к ответу
-                response_with_crc = response_data[:-2] + struct.pack('<H', crc)
-
-                # Отправляем ответ через COM-порт
-                ser.write(response_with_crc)
-                print(f"Отправлен ответ: {response_with_crc.hex().upper()} - {datetime.now()}")
-                logger.debug(f"Отправлен ответ: {response_with_crc.hex().upper()}")
+                # формируем запрос к серверу на обновление данных
+                post_data = {
+                    'request_type': str(hex(request_type)),
+                    'post_number': post_number,
+                    'weight_combined': weight_combined
+                }
+                response = balloon_api.put_carousel_data(post_data)
+                logger.debug(f"Данные получены от сервера - {response}")
 
     except serial.SerialException as e:
-        print(f"Ошибка: {e}. Проверьте правильность указанного порта.")
         logger.error(f"Ошибка: {e}. Проверьте правильность указанного порта.")
     finally:
         if ser:
@@ -102,6 +88,7 @@ def serial_exchange():
             ser.close()
             logger.debug("Соединение закрыто")
 
-if __name__ == "__main__":
-    while True:
-        serial_exchange()
+
+# if __name__ == "__main__":
+while True:
+    serial_exchange()

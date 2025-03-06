@@ -89,6 +89,33 @@ class Reader(models.Model):
         ordering = ['-change_date', '-change_time']
 
 
+class Carousel(models.Model):
+    is_empty = models.BooleanField(default=False, verbose_name="Принят запрос на наполнение баллона")
+    post_number = models.IntegerField(verbose_name="Номер поста наполнения")
+    empty_weight = models.FloatField(null=True, blank=True, verbose_name="Вес пустого баллона на посту")
+    full_weight = models.FloatField(null=True, blank=True, verbose_name="Вес полного баллона на посту")
+    nfc_tag = models.CharField(max_length=30, verbose_name="Номер метки")
+    serial_number = models.CharField(null=True, blank=True, max_length=30, verbose_name="Серийный номер")
+    size = models.IntegerField(choices=BALLOON_SIZE_CHOICES, default=50, verbose_name="Объём")
+    netto = models.FloatField(null=True, blank=True, verbose_name="Вес пустого баллона")
+    brutto = models.FloatField(null=True, blank=True, verbose_name="Вес наполненного баллона")
+    filling_status = models.BooleanField(default=False, verbose_name="Готов к наполнению")
+    change_date = models.DateField(auto_now=True, verbose_name="Дата изменений")
+    change_time = models.TimeField(auto_now=True, verbose_name="Время изменений")
+
+
+    def __int__(self):
+        return self.pk
+
+    def __str__(self):
+        return self.nfc_tag
+
+    class Meta:
+        verbose_name = "Карусель"
+        verbose_name_plural = "Карусель"
+        ordering = ['-change_date', '-change_time']
+
+
 class TruckType(models.Model):
     type = models.CharField(max_length=50, verbose_name="Тип грузовика")
 

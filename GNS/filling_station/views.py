@@ -5,7 +5,7 @@ from django.urls import reverse_lazy
 from django.views import generic
 from django.db.models import Q
 from .models import (Balloon, Truck, Trailer, TTN, BalloonsLoadingBatch, BalloonsUnloadingBatch,
-                     BalloonAmount, AutoGasBatch, Reader)
+                     BalloonAmount, AutoGasBatch, Reader, Carousel)
 from .admin import BalloonResources
 from .forms import (GetBalloonsAmount, BalloonForm, TruckForm, TrailerForm, TTNForm,
                     BalloonsLoadingBatchForm, BalloonsUnloadingBatchForm, AutoGasBatchForm)
@@ -108,6 +108,12 @@ def reader_info(request, reader=1):
         'reader_status': STATUS_LIST[reader]
     }
     return render(request, "rfid_tables.html", context)
+
+
+class CarouselListView(generic.ListView):
+    model = Carousel
+    paginate_by = 15
+    template_name = 'filling_station/carousel_list.html'
 
 
 # Партии приёмки баллонов
