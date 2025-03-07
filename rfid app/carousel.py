@@ -68,7 +68,7 @@ def serial_exchange():
                 service_byte = int.from_bytes(data[5:7], byteorder='little')
                 crc = int.from_bytes(data[6:8], byteorder='little')
 
-                logger.debug(f"Получен запрос от поста. Тип запроса: {hex(request_type)}. Номер поста: {post_number}"
+                logger.debug(f"Получен запрос от поста. Тип запроса: {hex(request_type)}. Номер поста: {post_number} "
                              f"Масса баллона: {weight_combined}")
 
                 # формируем запрос к серверу на обновление данных
@@ -78,7 +78,12 @@ def serial_exchange():
                     'weight_combined': weight_combined
                 }
                 response = balloon_api.put_carousel_data(post_data)
-                logger.debug(f"Данные получены от сервера - {response}")
+
+                if response.get('error'):
+                    logger.error(f"Данные получены от сервера. Ошибка - {response}")
+                else:
+                    logger.debug(f"Данные получены от сервера - {response}. "
+                                 f"Записываем вес {int(response.get('full_weight'))} в пост")
 
     except serial.SerialException as e:
         logger.error(f"Ошибка: {e}. Проверьте правильность указанного порта.")

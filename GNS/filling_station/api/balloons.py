@@ -10,8 +10,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, action, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from filling_station.tasks import send_to_opc
-from datetime import datetime, date
-from .serializers import (BalloonSerializer, СarouselSerializer, BalloonAmountSerializer,
+from datetime import datetime, date, timedelta
+from .serializers import (BalloonSerializer, CarouselSerializer, BalloonAmountSerializer,
                           BalloonsLoadingBatchSerializer, BalloonsUnloadingBatchSerializer,
                           ActiveLoadingBatchSerializer, ActiveUnloadingBatchSerializer,
                           BalloonAmountLoadingSerializer, BalloonAmountUnloadingSerializer)
@@ -225,7 +225,7 @@ def update_from_carousel(request):
 
     # Уникальный ключ для кэширования запроса
     cache_key = f"carousel_request_{request_type}_{post_number}_{weight_combined}"
-    cache_time = 1
+    cache_time = 5
 
     if cache.get(cache_key):
         logger.debug(f"Запрос уже обрабатывается: {request_type} {post_number} {weight_combined}")
@@ -240,35 +240,41 @@ def update_from_carousel(request):
     if request_type == '0x7a':
         try:
             logger.debug(f'запрос типа 0x7a')
-            balloon = Reader.objects.filter(number=8).first()
+            current_time = datetime.now()
+            one_minute_ago = current_time - timedelta(minutes=1)
+            balloon = Reader.objects.filter(number=8, change_time__gt=one_minute_ago).first()
             if not balloon:
                 logger.error("Объект Reader с number=8 не найден")
-                return Response({"error": "В базе данных отсутствуют данные по 8 считывателю"}, status=status.HTTP_404_NOT_FOUND)
-
-            carousel_post = Сarousel.objects.create(
-                is_empty = True,
-                post_number=post_number,
-                empty_weight = weight_combined / 1000,
-                nfc_tag = balloon.nfc_tag,
-                serial_number = balloon.serial_number,
-                size = balloon.size,
-                netto = balloon.netto,
-                brutto = balloon.brutto,
-                filling_status = balloon.filling_status
-            )
-            serializer = СarouselSerializer(carousel_post)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+                carousel_post = Carousel.objects.create(
+                    is_empty=True,
+                    post_number=post_number,
+                    empty_weight=weight_combined / 1000,
+                )
+                return Response({"error": "Баллон не распознан"}, status=status.HTTP_201_CREATED)
+            else:
+                carousel_post = Carousel.objects.create(
+                    is_empty = True,
+                    post_number=post_number,
+                    empty_weight = weight_combined / 1000,
+                    nfc_tag = balloon.nfc_tag,
+                    serial_number = balloon.serial_number,
+                    size = balloon.size,
+                    netto = balloon.netto,
+                    brutto = balloon.brutto,
+                    filling_status = balloon.filling_status
+                )
+                # serializer = CarouselSerializer(carousel_post)
+                return Response({"full_weight":balloon.brutto}, status=status.HTTP_201_CREATED)
         except Exception as error:
             logger.error(f'Ошибка при обработке запроса типа 0x7a - {error}')
             return Response({"error": str(error)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     else:
         try:
-            carousel_post = Сarousel.objects.filter(post_number=post_number).first()
+            carousel_post = Carousel.objects.filter(post_number=post_number).first()
             carousel_post.is_empty = False
             carousel_post.full_weight = weight_combined / 1000
             carousel_post.save()
-            serializer = СarouselSerializer(carousel_post)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_200_OK)
         except Exception as error:
             logger.error(f'Ошибка при обработке запроса типа 0x70 - {error}')
             return Response({"error": str(error)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

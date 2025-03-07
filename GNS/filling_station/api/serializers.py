@@ -11,7 +11,7 @@ class BalloonSerializer(serializers.ModelSerializer):
                   'filling_status', 'update_passport_required']
 
 
-class СarouselSerializer(serializers.ModelSerializer):
+class CarouselSerializer(serializers.ModelSerializer):
     class Meta:
         model = Carousel
         fields = '__all__'
