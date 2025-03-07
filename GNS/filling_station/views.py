@@ -4,26 +4,26 @@ from django.core.paginator import Paginator
 from django.urls import reverse_lazy
 from django.views import generic
 from django.db.models import Q
-from .models import (Balloon, Truck, Trailer, RailwayTank, TTN, BalloonsLoadingBatch, BalloonsUnloadingBatch,
-                     RailwayBatch, BalloonAmount, AutoGasBatch)
+from .models import (Balloon, Truck, Trailer, TTN, BalloonsLoadingBatch, BalloonsUnloadingBatch,
+                     BalloonAmount, AutoGasBatch, Reader, Carousel)
 from .admin import BalloonResources
-from .forms import (GetBalloonsAmount, BalloonForm, TruckForm, TrailerForm, RailwayTankForm, TTNForm,
-                    BalloonsLoadingBatchForm, BalloonsUnloadingBatchForm, RailwayBatchForm, AutoGasBatchForm)
+from .forms import (GetBalloonsAmount, BalloonForm, TruckForm, TrailerForm, TTNForm,
+                    BalloonsLoadingBatchForm, BalloonsUnloadingBatchForm, AutoGasBatchForm)
 from datetime import datetime, timedelta
 
 STATUS_LIST = {
-    '1': 'Погрузка полного баллона на трал 1',
-    '2': 'Погрузка полного баллона на трал 2',
-    '3': 'Приёмка пустого баллона из трала 1',
-    '4': 'Приёмка пустого баллона из трала 2',
-    '5': 'Регистрация полного баллона на складе',
-    '6': 'Регистрация пустого баллона в цеху',
-    '7': 'Наполнение баллона сжиженным газом. Карусель №1',
-    '8': 'Наполнение баллона сжиженным газом. Карусель №2',
-    '9': 'Вход в наполнительный цех из ремонтного',
-    '10': 'Выход из наполнительного цеха в ремонтный',
-    '11': 'Вход в ремонтный цех из наполнительного',
-    '12': 'Выход из ремонтного цеха в наполнительный',
+    1: 'Погрузка полного баллона на трал 1',
+    2: 'Погрузка полного баллона на трал 2',
+    3: 'Приёмка пустого баллона из трала 1',
+    4: 'Приёмка пустого баллона из трала 2',
+    5: 'Регистрация полного баллона на складе',
+    6: 'Регистрация пустого баллона в цеху',
+    7: 'Наполнение баллона сжиженным газом. Карусель №1',
+    8: 'Наполнение баллона сжиженным газом. Карусель №2',
+    9: 'Вход в наполнительный цех из ремонтного',
+    10: 'Выход из наполнительного цеха в ремонтный',
+    11: 'Вход в ремонтный цех из наполнительного',
+    12: 'Выход из ремонтного цеха в наполнительный',
 }
 
 
@@ -58,7 +58,7 @@ class BalloonDeleteView(generic.DeleteView):
     template_name = 'filling_station/balloon_confirm_delete.html'
 
 
-def reader_info(request, reader='1'):
+def reader_info(request, reader=1):
     current_date = datetime.now().date()
     previous_date = current_date - timedelta(days=1)
 
@@ -66,15 +66,16 @@ def reader_info(request, reader='1'):
         required_date = request.POST.get("date")
         format_required_date = datetime.strptime(required_date, '%Y-%m-%d')
 
-        dataset = BalloonResources().export(Balloon.objects.filter(status=STATUS_LIST[reader], change_date=format_required_date))
-        response = HttpResponse(dataset.xls, content_type='xls')
-        response['Content-Disposition'] = f'attachment; filename="RFID_1_{required_date}.xls"'
+        # Экспортируем данные в Excel
+        dataset = BalloonResources().export(Reader.objects.filter(number=reader, change_date=format_required_date))
+        response = HttpResponse(dataset.xlsx, content_type='xlsx')
+        response['Content-Disposition'] = f'attachment; filename="RFID_{reader}_{required_date}.xlsx"'
 
         return response
     else:
         date_process = GetBalloonsAmount()
 
-    balloons_list = Balloon.objects.order_by('-change_date', '-change_time').filter(status=STATUS_LIST[reader])
+    balloons_list = Reader.objects.order_by('-change_date', '-change_time').filter(number=reader)
     current_quantity = BalloonAmount.objects.filter(reader_id=reader, change_date=current_date).first()
     previous_quantity = BalloonAmount.objects.filter(reader_id=reader, change_date=previous_date).first()
 
@@ -103,9 +104,16 @@ def reader_info(request, reader='1'):
         'current_quantity_by_sensor': current_quantity_balloons,
         'previous_quantity_by_sensor': previous_quantity_balloons,
         'form': date_process,
-        'reader': reader
+        'reader': reader,
+        'reader_status': STATUS_LIST[reader]
     }
     return render(request, "rfid_tables.html", context)
+
+
+class CarouselListView(generic.ListView):
+    model = Carousel
+    paginate_by = 15
+    template_name = 'filling_station/carousel_list.html'
 
 
 # Партии приёмки баллонов
@@ -183,31 +191,6 @@ class AutoGasBatchDeleteView(generic.DeleteView):
     template_name = 'filling_station/auto_batch_confirm_delete.html'
 
 
-# Партии приёмки газа в ж/д цистернах
-class RailwayBatchListView(generic.ListView):
-    model = RailwayBatch
-    paginate_by = 15
-    template_name = 'filling_station/railway_batch_list.html'
-
-
-class RailwayBatchDetailView(generic.DetailView):
-    model = RailwayBatch
-    context_object_name = 'batch'
-    template_name = 'filling_station/railway_batch_detail.html'
-
-
-class RailwayBatchUpdateView(generic.UpdateView):
-    model = RailwayBatch
-    form_class = RailwayBatchForm
-    template_name = 'filling_station/_equipment_form.html'
-
-
-class RailwayBatchDeleteView(generic.DeleteView):
-    model = RailwayBatch
-    success_url = reverse_lazy("filling_station:railway_batch_list")
-    template_name = 'filling_station/railway_batch_confirm_delete.html'
-
-
 # Грузовики
 class TruckView(generic.ListView):
     model = Truck
@@ -264,35 +247,6 @@ class TrailerDeleteView(generic.DeleteView):
     model = Trailer
     success_url = reverse_lazy("filling_station:trailer_list")
     template_name = 'filling_station/trailer_confirm_delete.html'
-
-
-# ж/д цистерны
-class RailwayTankView(generic.ListView):
-    model = RailwayTank
-    paginate_by = 15
-
-
-class RailwayTankDetailView(generic.DetailView):
-    model = RailwayTank
-
-    
-class RailwayTankCreateView(generic.CreateView):
-    model = RailwayTank
-    form_class = RailwayTankForm
-    template_name = 'filling_station/_equipment_form.html'
-    success_url = reverse_lazy("filling_station:railway_tank_list")
-
-
-class RailwayTankUpdateView(generic.UpdateView):
-    model = RailwayTank
-    form_class = RailwayTankForm
-    template_name = 'filling_station/_equipment_form.html'
-
-
-class RailwayTankDeleteView(generic.DeleteView):
-    model = RailwayTank
-    success_url = reverse_lazy("filling_station:railway_tank_list")
-    template_name = 'filling_station/railway_tank_confirm_delete.html'
 
 
 # ТТН

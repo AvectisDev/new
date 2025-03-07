@@ -3,6 +3,8 @@ import datetime
 from pathlib import Path
 from dotenv import load_dotenv
 from celery.schedules import crontab
+from import_export.formats.base_formats import XLSX
+
 
 load_dotenv()
 
@@ -79,6 +81,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'GNS.urls'
 
+EXPORT_FORMATS = [XLSX]
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -111,12 +115,12 @@ DATABASES = {
     }
 }
 
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-#         'LOCATION': 'redis://localhost:6379/1'
-#     }
-# }
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://localhost:6379/1'
+    }
+}
 
 # PGHISTORY_CONTEXT_FIELD = None
 
@@ -146,7 +150,7 @@ LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'Europe/Minsk'
 USE_I18N = True
-USE_TZ = True
+USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
@@ -187,7 +191,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': 'django.log',
+            'filename': os.path.join(BASE_DIR, 'logs', 'django.log'),
             'formatter': 'verbose',
         },
     },

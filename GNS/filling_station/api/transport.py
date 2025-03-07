@@ -1,5 +1,4 @@
-from ..models import (Truck, Trailer, RailwayTank,
-                      RailwayBatch, AutoGasBatch)
+from ..models import Truck, Trailer, AutoGasBatch
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status, viewsets
 from rest_framework.views import APIView
@@ -7,8 +6,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, action
 from rest_framework.permissions import IsAuthenticated
 from datetime import datetime, date
-from .serializers import (TruckSerializer, TrailerSerializer, RailwayTankSerializer,
-                          RailwayBatchSerializer, AutoGasBatchSerializer)
+from .serializers import (TruckSerializer, TrailerSerializer, AutoGasBatchSerializer)
 
 
 class TruckView(APIView):
@@ -81,78 +79,6 @@ class TrailerView(APIView):
         trailer = get_object_or_404(Trailer, id=trailer_id)
 
         serializer = TrailerSerializer(trailer, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class RailwayTanksView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        on_station = request.query_params.get('on_station', False)
-        registration_number = request.query_params.get('registration_number', False)
-
-        if on_station:
-            railway_tanks = RailwayTank.objects.filter(is_on_station=True)
-            if not railway_tanks:
-                return Response(status=status.HTTP_404_NOT_FOUND)
-            serializer = RailwayTankSerializer(railway_tanks, many=True)
-            return Response(serializer.data)
-
-        if registration_number:
-            railway_tank = get_object_or_404(RailwayTank, registration_number=registration_number)
-            serializer = RailwayTankSerializer(railway_tank)
-            return Response(serializer.data)
-
-    def post(self, request):
-        serializer = RailwayTankSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def patch(self, request):
-        railway_tank_id = request.data['id']
-        railway_tank = get_object_or_404(RailwayTank, id=railway_tank_id)
-
-        serializer = RailwayTankSerializer(railway_tank, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class RailwayBatchView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        batches = RailwayBatch.objects.filter(is_active=True).first()
-
-        if not batches:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        serializer = RailwayBatchSerializer(batches)
-        return Response(serializer.data)
-
-    def post(self, request):
-        serializer = RailwayBatchSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def patch(self, request):
-        batch_id = request.data.get('id')
-        batch = get_object_or_404(RailwayBatch, id=batch_id)
-
-        if not request.data.get('is_active', True):
-            current_date = datetime.now()
-            request.data['end_date'] = current_date.date()
-            request.data['end_time'] = current_date.time()
-
-        serializer = RailwayBatchSerializer(batch, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

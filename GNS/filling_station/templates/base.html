@@ -31,18 +31,30 @@
                    role="button"
                    aria-expanded="false">Считыватели</a>
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="/reader/1" style="color: #051831;">1 - Погрузка полного баллона на трал 1</a></li>
-                    <li><a class="dropdown-item" href="/reader/2" style="color: #051831;">2 - Погрузка полного баллона на трал 2</a></li>
-                    <li><a class="dropdown-item" href="/reader/3" style="color: #051831;">3 - Приёмка пустого баллона из трала 1</a></li>
-                    <li><a class="dropdown-item" href="/reader/4" style="color: #051831;">4 - Приёмка пустого баллона из трала 2</a></li>
-                    <li><a class="dropdown-item" href="/reader/5" style="color: #051831;">5 - Регистрация полного баллона на складе</a></li>
-                    <li><a class="dropdown-item" href="/reader/6" style="color: #051831;">6 - Регистрация пустого баллона в цеху</a></li>
-                    <li><a class="dropdown-item" href="/reader/7" style="color: #051831;">7 - Наполнение баллона сжиженным газом. Карусель №1</a></li>
-                    <li><a class="dropdown-item" href="/reader/8" style="color: #051831;">8 - Наполнение баллона сжиженным газом. Карусель №2</a></li>
-                    <li><a class="dropdown-item" href="/reader/9" style="color: #051831;">9 - Вход в наполнительный цех из ремонтного</a></li>
-                    <li><a class="dropdown-item" href="/reader/10" style="color: #051831;">10 - Выход из наполнительного цеха в ремонтный</a></li>
-                    <li><a class="dropdown-item" href="/reader/11" style="color: #051831;">11 - Вход в ремонтный цех из наполнительного</a></li>
-                    <li><a class="dropdown-item" href="/reader/12" style="color: #051831;">12 - Выход из ремонтного цеха в наполнительный</a></li>
+                    <li><a class="dropdown-item" href="/reader/1" style="color: #051831;">1 - Погрузка полного баллона
+                        на трал 1</a></li>
+                    <li><a class="dropdown-item" href="/reader/2" style="color: #051831;">2 - Погрузка полного баллона
+                        на трал 2</a></li>
+                    <li><a class="dropdown-item" href="/reader/3" style="color: #051831;">3 - Приёмка пустого баллона из
+                        трала 1</a></li>
+                    <li><a class="dropdown-item" href="/reader/4" style="color: #051831;">4 - Приёмка пустого баллона из
+                        трала 2</a></li>
+                    <li><a class="dropdown-item" href="/reader/5" style="color: #051831;">5 - Регистрация полного
+                        баллона на складе</a></li>
+                    <li><a class="dropdown-item" href="/reader/6" style="color: #051831;">6 - Регистрация пустого
+                        баллона в цеху</a></li>
+                    <li><a class="dropdown-item" href="/reader/7" style="color: #051831;">7 - Наполнение баллона
+                        сжиженным газом. Карусель №1</a></li>
+                    <li><a class="dropdown-item" href="/reader/8" style="color: #051831;">8 - Наполнение баллона
+                        сжиженным газом. Карусель №2</a></li>
+                    <li><a class="dropdown-item" href="/reader/9" style="color: #051831;">9 - Вход в наполнительный цех
+                        из ремонтного</a></li>
+                    <li><a class="dropdown-item" href="/reader/10" style="color: #051831;">10 - Выход из наполнительного
+                        цеха в ремонтный</a></li>
+                    <li><a class="dropdown-item" href="/reader/11" style="color: #051831;">11 - Вход в ремонтный цех из
+                        наполнительного</a></li>
+                    <li><a class="dropdown-item" href="/reader/12" style="color: #051831;">12 - Выход из ремонтного цеха
+                        в наполнительный</a></li>
                 </ul>
             </li>
             <li class="nav-item dropdown">
@@ -65,13 +77,13 @@
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="{% url 'filling_station:truck_list' %}"
                            style="color: #051831;">Грузовики</a></li>
-                    <li><a class="dropdown-item" href="{% url 'filling_station:trailer_list' %}"
-                           style="color: #051831;">Прицепы</a></li>
-
                 </ul>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'filling_station:ttn_list' %}" style="color: #051831;">ТТН</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/carousel" style="color: #051831;">УНБ</a>
             </li>
         </ul>
 

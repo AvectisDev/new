@@ -1,14 +1,13 @@
 from django.contrib import admin
-from .models import (Balloon, Truck, Trailer, RailwayTank, TTN, BalloonsLoadingBatch, BalloonsUnloadingBatch,
-                     RailwayBatch, AutoGasBatch, TruckType, TrailerType, FilePath)
+from .models import (Balloon, Truck, Trailer, TTN, BalloonsLoadingBatch, BalloonsUnloadingBatch,
+                     AutoGasBatch, TruckType, TrailerType)
 from import_export import resources
 
 
 class BalloonResources(resources.ModelResource):
     class Meta:
         model = Balloon
-        fields = ['id', 'nfc_tag', 'serial_number', 'creation_date', 'size', 'netto', 'brutto',
-                  'current_examination_date', 'next_examination_date', 'manufacturer', 'wall_thickness', 'status']
+        fields = ['nfc_tag', 'serial_number', 'size', 'netto', 'brutto', 'filling_status', "change_date", "change_time"]
 
 
 @admin.register(Balloon)
@@ -46,13 +45,6 @@ class TrailerTypeAdmin(admin.ModelAdmin):
     list_display = ['id', 'type']
 
 
-@admin.register(RailwayTank)
-class RailwayTankAdmin(admin.ModelAdmin):
-    list_display = ['id', 'registration_number', 'empty_weight', 'full_weight', 'gas_weight', 'gas_type', 'is_on_station',
-                    'entry_date', 'entry_time', 'departure_date', 'departure_time']
-    search_fields = ['number', 'is_on_station', 'entry_date', 'departure_date']
-
-
 @admin.register(TTN)
 class TTNAdmin(admin.ModelAdmin):
     list_display = ['id', 'number', 'contract', 'shipper', 'consignee', 'gas_amount', 'gas_type', 'balloons_amount',
@@ -79,22 +71,9 @@ class BalloonsUnloadingBatchAdmin(admin.ModelAdmin):
     search_fields = ['begin_date', 'end_date', 'truck', 'is_active', 'ttn']
 
 
-@admin.register(RailwayBatch)
-class RailwayBatchAdmin(admin.ModelAdmin):
-    list_display = ['id', 'end_date', 'end_time', 'gas_amount_spbt', 'gas_amount_pba', 'is_active', 'import_ttn',
-                    'export_ttn']
-    list_filter = ['begin_date', 'end_date', 'is_active']
-    search_fields = ['begin_date', 'end_date', 'is_active', 'ttn']
-
-
 @admin.register(AutoGasBatch)
 class AutoGasBatchAdmin(admin.ModelAdmin):
     list_display = ['id', 'batch_type', 'end_date', 'end_time', 'truck', 'trailer', 'gas_amount', 'gas_type',
                     'scale_empty_weight', 'scale_full_weight', 'weight_gas_amount', 'is_active', 'ttn']
     list_filter = ['begin_date', 'end_date', 'is_active']
     search_fields = ['begin_date', 'end_date', 'truck', 'is_active', 'ttn']
-
-
-@admin.register(FilePath)
-class FilePathAdmin(admin.ModelAdmin):
-    list_display = ('path',)
