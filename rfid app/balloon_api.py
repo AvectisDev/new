@@ -42,13 +42,18 @@ def put_carousel_data(data: dict):
     :return: возвращает словарь со статусом ответа и весом баллона
     """
     try:
-        response = requests.post(f"{BASE_URL}/carousel-update", json=data, timeout=3)
+        logger.debug(f"balloon_api данные отправлены - {data}")
+        response = requests.post(f"{BASE_URL}/carousel-update", json=data, timeout=1)
+        logger.debug(f"balloon_api данные получены - {response}")
         response.raise_for_status()
-        return response.json()
+        if response.content:  # Если ответ не пустой
+            return response.json()
+        else:
+            return {}
 
     except requests.exceptions.RequestException as error:
         logger.error(f"put_carousel_data function error: {error}")
-        return None
+        return {}
 
 
 async def update_balloon_amount(from_who: str, data: dict):

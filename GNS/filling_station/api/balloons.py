@@ -239,10 +239,11 @@ def update_from_carousel(request):
         return Response({"error": "Не указан тип запроса"}, status=status.HTTP_400_BAD_REQUEST)
     if request_type == '0x7a':
         try:
-            logger.debug(f'запрос типа 0x7a')
             current_time = datetime.now()
             one_minute_ago = current_time - timedelta(minutes=1)
-            balloon = Reader.objects.filter(number=8, change_time__gt=one_minute_ago).first()
+
+            balloon = Reader.objects.filter(number=8, change_time__lt=one_minute_ago.time(), change_date__lt=one_minute_ago.date()).first()
+            logger.debug(f"запрос типа 0x7a. Выполнен поиск баллона")
             if not balloon:
                 logger.error("Объект Reader с number=8 не найден")
                 carousel_post = Carousel.objects.create(
@@ -250,6 +251,7 @@ def update_from_carousel(request):
                     post_number=post_number,
                     empty_weight=weight_combined / 1000,
                 )
+                logger.debug(f"запрос типа 0x7a. Отправка ответа от django...")
                 return Response({"error": "Баллон не распознан"}, status=status.HTTP_201_CREATED)
             else:
                 carousel_post = Carousel.objects.create(
@@ -258,12 +260,12 @@ def update_from_carousel(request):
                     empty_weight = weight_combined / 1000,
                     nfc_tag = balloon.nfc_tag,
                     serial_number = balloon.serial_number,
-                    size = balloon.size,
                     netto = balloon.netto,
                     brutto = balloon.brutto,
                     filling_status = balloon.filling_status
                 )
                 # serializer = CarouselSerializer(carousel_post)
+                logger.debug(f"запрос типа 0x7a. Отправка ответа от django...")
                 return Response({"full_weight":balloon.brutto}, status=status.HTTP_201_CREATED)
         except Exception as error:
             logger.error(f'Ошибка при обработке запроса типа 0x7a - {error}')
@@ -274,6 +276,7 @@ def update_from_carousel(request):
             carousel_post.is_empty = False
             carousel_post.full_weight = weight_combined / 1000
             carousel_post.save()
+            logger.debug(f"Отправка ответа от django...")
             return Response(status=status.HTTP_200_OK)
         except Exception as error:
             logger.error(f'Ошибка при обработке запроса типа 0x70 - {error}')

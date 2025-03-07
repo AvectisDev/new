@@ -78,15 +78,23 @@ def serial_exchange():
                     'weight_combined': weight_combined
                 }
                 response = balloon_api.put_carousel_data(post_data)
+                logger.debug(f'Ответ от сервера {response}')
 
                 if response.get('error'):
                     logger.error(f"Данные получены от сервера. Ошибка - {response}")
-                else:
+                elif response.get('full_weight'):
+                    full_weight = response.get('full_weight')
+                    if full_weight:
+                        full_weight = int(full_weight * 1000)
                     logger.debug(f"Данные получены от сервера - {response}. "
-                                 f"Записываем вес {int(response.get('full_weight'))} в пост")
+                                 f"Записываем вес {full_weight} в пост")
+                else:
+                    logger.debug(f"Данные получены от сервера - {response}")
 
     except serial.SerialException as e:
         logger.error(f"Ошибка: {e}. Проверьте правильность указанного порта.")
+    except Exception as error:
+        logger.error(f"Общая ошибка: {error}.")
     finally:
         if ser:
             # Закрываем соединение только если оно было открыто
